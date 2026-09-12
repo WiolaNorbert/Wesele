@@ -37,7 +37,7 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 <section class="content">
 <div class="drop" id="drop">
 <div class="icon">📷</div><strong>Wybierz zdjęcia lub filmy</strong>
-<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b>1 GB</b>.</div>
+<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b>50 MB</b>.</div>
 <label class="choose">Wybierz pliki<input id="files" type="file" accept="image/*,video/*" multiple></label>
 <div class="list" id="list"></div>
 </div>
@@ -54,7 +54,7 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 <script>
 /* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
-const MAX = 50 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
+const MAX = 50 * 1024 * 1024; // 50 MB na plik — dopasuj wg potrzeb
 const CHUNK = 20 * 1024 * 1024;     // fragmenty po 20 MB (mniej requestów = mniej narzutu Apps Script)
 /* ================================================================= */
 
