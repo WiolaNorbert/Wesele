@@ -1,147 +1,1613 @@
 <!doctype html>
 <html lang="pl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f5eee8">
+
+<meta charset="utf-8">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#f5eee8"
+>
+
 <title>Nasze wspólne wspomnienia</title>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap');
-:root{--bg:#f5eee8;--paper:#fffdfa;--ink:#3d3530;--muted:#8a7b70;--gold:#a88768;--line:#e5d8cd}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0,#fff 0,transparent 32%),radial-gradient(circle at 100% 100%,#e7dbd0 0,transparent 34%),var(--bg);color:var(--ink);font-family:Montserrat,system-ui,sans-serif}
-.wrap{max-width:720px;margin:auto;padding:24px 16px 40px}.card{background:rgba(255,253,250,.95);border:1px solid #a8876826;border-radius:30px;box-shadow:0 20px 70px #4d392611;overflow:hidden}
-.hero{text-align:center;padding:42px 24px 26px}.orn{font-size:25px;color:var(--gold);letter-spacing:9px}.eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:10px;color:var(--muted);margin-top:12px}
-h1{font:500 clamp(45px,12vw,72px)/.88 "Cormorant Garamond",Georgia,serif;margin:16px 0 12px}.subtitle{font:400 22px/1.2 "Cormorant Garamond",Georgia,serif;color:var(--muted)}.rule{display:flex;justify-content:center;align-items:center;gap:12px;color:var(--gold);margin:22px}.rule:before,.rule:after{content:"";width:62px;height:1px;background:var(--line)}
-.content{padding:0 25px 32px}.drop{border:1.5px dashed #cbb7a7;border-radius:22px;background:#fffaf5;padding:26px 18px;text-align:center;transition:.2s}.drop.drag{background:#f2e8df;border-color:var(--gold)}
-.icon{font-size:34px}.drop strong{display:block;margin:9px 0 5px}.small{font-size:11px;line-height:1.65;color:var(--muted)}
-input{display:none}.choose{display:inline-block;margin-top:15px;padding:12px 20px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
-.list{margin-top:15px;display:grid;gap:7px}.file{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;background:#f7f1ec;border-radius:10px;font-size:11px}.file span:last-child{color:var(--muted);white-space:nowrap}
-button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padding:15px;border:0;border-radius:999px;background:var(--gold);color:#fff;cursor:pointer}.send:disabled{opacity:.5}
-.progress{height:7px;background:#eee5de;border-radius:99px;overflow:hidden;margin-top:18px}.bar{height:100%;width:0;background:var(--ink);transition:width .2s}.status{text-align:center;font-size:12px;margin-top:13px;min-height:18px}.ok{color:#507052}.err{color:#a24d4d}
-.gallery{margin-top:34px;padding-top:28px;border-top:1px solid var(--line)}
-.gallery h2{font:500 26px "Cormorant Garamond",Georgia,serif;text-align:center;margin:0 0 16px;color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
-.grid a{display:block;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px #4d392622}
-.grid img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#eee5de}
-.empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:14px 0}
-.footer{text-align:center;color:var(--muted);font-size:10px;margin-top:18px;line-height:1.6}
+
+@import url(
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap'
+);
+
+:root{
+  --bg:#f5eee8;
+  --paper:#fffdfa;
+  --ink:#3d3530;
+  --muted:#8a7b70;
+  --gold:#a88768;
+  --line:#e5d8cd;
+  --success:#507052;
+  --error:#a24d4d;
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+
+  background:
+    radial-gradient(
+      circle at 10% 0,
+      #fff 0,
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      #e7dbd0 0,
+      transparent 34%
+    ),
+    var(--bg);
+
+  color:var(--ink);
+  font-family:Montserrat,system-ui,sans-serif;
+}
+
+.wrap{
+  max-width:720px;
+  margin:auto;
+  padding:24px 16px 40px;
+}
+
+.card{
+  background:rgba(255,253,250,.95);
+  border:1px solid #a8876826;
+  border-radius:30px;
+  box-shadow:0 20px 70px #4d392611;
+  overflow:hidden;
+}
+
+.hero{
+  text-align:center;
+  padding:42px 24px 26px;
+}
+
+.orn{
+  font-size:25px;
+  color:var(--gold);
+  letter-spacing:9px;
+}
+
+.eyebrow{
+  text-transform:uppercase;
+  letter-spacing:3px;
+  font-size:10px;
+  color:var(--muted);
+  margin-top:12px;
+}
+
+h1{
+  font:
+    500 clamp(45px,12vw,72px)/.88
+    "Cormorant Garamond",
+    Georgia,
+    serif;
+
+  margin:16px 0 12px;
+}
+
+.subtitle{
+  font:
+    400 22px/1.2
+    "Cormorant Garamond",
+    Georgia,
+    serif;
+
+  color:var(--muted);
+}
+
+.rule{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  color:var(--gold);
+  margin:22px;
+}
+
+.rule:before,
+.rule:after{
+  content:"";
+  width:62px;
+  height:1px;
+  background:var(--line);
+}
+
+.content{
+  padding:0 25px 32px;
+}
+
+.drop{
+  border:1.5px dashed #cbb7a7;
+  border-radius:22px;
+  background:#fffaf5;
+  padding:26px 18px;
+  text-align:center;
+  transition:.2s;
+}
+
+.drop.drag{
+  background:#f2e8df;
+  border-color:var(--gold);
+}
+
+.icon{
+  font-size:34px;
+}
+
+.drop strong{
+  display:block;
+  margin:9px 0 5px;
+}
+
+.small{
+  font-size:11px;
+  line-height:1.65;
+  color:var(--muted);
+}
+
+input{
+  display:none;
+}
+
+.choose{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 20px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.list{
+  margin-top:15px;
+  display:grid;
+  gap:7px;
+}
+
+.file{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 12px;
+  background:#f7f1ec;
+  border-radius:10px;
+  font-size:11px;
+}
+
+.file span:first-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.file span:last-child{
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+button{
+  font:
+    600 12px
+    Montserrat,
+    sans-serif;
+}
+
+.send{
+  width:100%;
+  margin-top:17px;
+  padding:15px;
+  border:0;
+  border-radius:999px;
+  background:var(--gold);
+  color:#fff;
+  cursor:pointer;
+}
+
+.send:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+
+/* ==============================
+   PROGRESS
+   ============================== */
+
+.progress-box{
+  margin-top:18px;
+}
+
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+
+  font-size:11px;
+  color:var(--muted);
+
+  margin-bottom:7px;
+}
+
+.progress{
+  height:8px;
+  background:#eee5de;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.bar{
+  height:100%;
+  width:0;
+
+  background:var(--ink);
+
+  transition:
+    width .15s linear;
+}
+
+.progress-total{
+  margin-top:12px;
+}
+
+.total-bar{
+  background:var(--gold);
+}
+
+.status{
+  text-align:center;
+  font-size:12px;
+  margin-top:13px;
+  min-height:18px;
+}
+
+.ok{
+  color:var(--success);
+}
+
+.err{
+  color:var(--error);
+}
+
+
+/* ==============================
+   GALLERY
+   ============================== */
+
+.gallery{
+  margin-top:34px;
+  padding-top:28px;
+  border-top:1px solid var(--line);
+}
+
+.gallery h2{
+  font:
+    500 26px
+    "Cormorant Garamond",
+    Georgia,
+    serif;
+
+  text-align:center;
+  margin:0 0 16px;
+  color:var(--ink);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(92px,1fr)
+    );
+
+  gap:8px;
+}
+
+.grid a{
+  display:block;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 4px 14px #4d392622;
+}
+
+.grid img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+  background:#eee5de;
+}
+
+.empty{
+  grid-column:1/-1;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  padding:14px 0;
+}
+
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:18px;
+  line-height:1.6;
+}
+
+
+/* ==============================
+   UPLOAD DETAILS
+   ============================== */
+
+.upload-details{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+
+  margin-top:8px;
+
+  font-size:10px;
+  color:var(--muted);
+}
+
 </style>
+
 </head>
+
 <body>
-<div class="wrap"><main class="card">
+
+<div class="wrap">
+
+<main class="card">
+
 <section class="hero">
-<div class="orn">❦ ❦ ❦</div><div class="eyebrow">nasze wspólne wspomnienia</div>
-<h1>Wiola & Norbert</h1>
-<div class="subtitle">Dodaj swoje zdjęcia i filmy z tego wyjątkowego dnia</div>
-<div class="rule">♡</div>
-</section>
-<section class="content">
-<div class="drop" id="drop">
-<div class="icon">📷</div><strong>Wybierz zdjęcia lub filmy</strong>
-<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b>50 MB</b>.</div>
-<label class="choose">Wybierz pliki<input id="files" type="file" accept="image/*,video/*" multiple></label>
-<div class="list" id="list"></div>
+
+<div class="orn">
+  ❦ ❦ ❦
 </div>
-<button class="send" id="send">Wyślij wspomnienia</button>
-<div class="progress"><div class="bar" id="bar"></div></div><div class="status" id="status"></div>
+
+<div class="eyebrow">
+  nasze wspólne wspomnienia
+</div>
+
+<h1>
+  Wiola & Norbert
+</h1>
+
+<div class="subtitle">
+  Dodaj swoje zdjęcia i filmy z tego wyjątkowego dnia
+</div>
+
+<div class="rule">
+  ♡
+</div>
+
+</section>
+
+
+<section class="content">
+
+
+<div class="drop" id="drop">
+
+<div class="icon">
+  📷
+</div>
+
+<strong>
+  Wybierz zdjęcia lub filmy
+</strong>
+
+<div class="small">
+  Możesz dodać wiele plików naraz.<br>
+  Jeden plik może mieć maksymalnie
+  <b>50 MB</b>.
+</div>
+
+<label class="choose">
+
+  Wybierz pliki
+
+  <input
+    id="files"
+    type="file"
+    accept="image/*,video/*"
+    multiple
+  >
+
+</label>
+
+<div
+  class="list"
+  id="list"
+></div>
+
+</div>
+
+
+<button
+  class="send"
+  id="send"
+>
+  Wyślij wspomnienia
+</button>
+
+
+<!-- POSTĘP AKTUALNEGO PLIKU -->
+
+<div class="progress-box">
+
+  <div class="progress-label">
+
+    <span id="fileProgressLabel">
+      Gotowe
+    </span>
+
+    <span id="fileProgressPercent">
+      0%
+    </span>
+
+  </div>
+
+  <div class="progress">
+
+    <div
+      class="bar"
+      id="bar"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- POSTĘP CAŁEGO UPLOADU -->
+
+<div class="progress-box progress-total">
+
+  <div class="progress-label">
+
+    <span id="totalProgressLabel">
+      Całość
+    </span>
+
+    <span id="totalProgressPercent">
+      0%
+    </span>
+
+  </div>
+
+  <div class="progress">
+
+    <div
+      class="bar total-bar"
+      id="totalBar"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<div class="upload-details">
+
+  <span id="uploadedSize">
+    0 B / 0 B
+  </span>
+
+  <span id="uploadSpeed">
+    —
+  </span>
+
+  <span id="uploadEta">
+    —
+  </span>
+
+</div>
+
+
+<div
+  class="status"
+  id="status"
+></div>
+
+
+<!-- GALERIA -->
 
 <div class="gallery">
-<h2>Ostatnie zdjęcia</h2>
-<div class="grid" id="gallery"><div class="empty">Ładowanie…</div></div>
+
+<h2>
+  Ostatnie zdjęcia
+</h2>
+
+<div
+  class="grid"
+  id="gallery"
+>
+  <div class="empty">
+    Ładowanie…
+  </div>
 </div>
 
-</section></main>
-<div class="footer">Dziękujemy, że tworzysz z nami tę pamiątkę ♡</div></div>
+</div>
+
+
+</section>
+
+</main>
+
+
+<div class="footer">
+  Dziękujemy, że tworzysz z nami tę pamiątkę ♡
+</div>
+
+</div>
+
+
 <script>
-/* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
-const MAX = 50 * 1024 * 1024; // 50 MB na plik — dopasuj wg potrzeb
-const CHUNK = 20 * 1024 * 1024;     // fragmenty po 20 MB (mniej requestów = mniej narzutu Apps Script)
-/* ================================================================= */
 
-function blobToBase64(blob){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(",")[1]); // odetnij prefiks "data:...;base64,"
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
+/* ============================================================
+   KONFIGURACJA
+   ============================================================ */
 
-const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop"),galleryEl=document.querySelector("#gallery");
+const ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
 
-function fmt(n){return n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB"}
-function render(){list.innerHTML=[...filesEl.files].map(f=>`<div class="file"><span>${f.name}</span><span>${fmt(f.size)}</span></div>`).join("")}
-filesEl.onchange=render;
-["dragenter","dragover"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.add("drag")}));
-["dragleave","drop"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.remove("drag")}));
-drop.addEventListener("drop",e=>{filesEl.files=e.dataTransfer.files;render()});
 
-async function call(payload){
-  const r = await fetch(ENDPOINT, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(payload) });
-  if(!r.ok) throw new Error("Błąd serwera");
-  return await r.json();
-}
+/*
+ * Maksymalny rozmiar pojedynczego pliku.
+ */
+const MAX =
+  50 * 1024 * 1024;
 
-async function uploadFile(file){
-  if(file.size>MAX) throw new Error(`${file.name} przekracza limit rozmiaru.`);
-  const init = await call({ action:"start", name:file.name, mimeType:file.type||"application/octet-stream", size:file.size });
-  if(!init.ok || !init.uploadId) throw new Error(init.error || "Nie udało się rozpocząć uploadu.");
-  const uploadId = init.uploadId;
-  let offset=0;
-  while(offset<file.size){
-    const chunk = file.slice(offset, Math.min(offset+CHUNK, file.size));
-    const base64 = await blobToBase64(chunk);
-    const data = await call({ action:"chunk", uploadId, offset, total:file.size, data:base64 });
-    if(!data.ok) throw new Error(data.error || `Błąd wysyłania fragmentu (offset ${offset})`);
-    offset += chunk.size;
-    bar.style.width = Math.round(offset/file.size*100)+"%";
+
+/*
+ * Pliki do tego rozmiaru są wysyłane
+ * jednym requestem.
+ *
+ * To jest najważniejsza optymalizacja
+ * dla zdjęć 200 KB – kilka MB.
+ */
+const SMALL_FILE_LIMIT =
+  5 * 1024 * 1024;
+
+
+/*
+ * Chunk dla dużych plików.
+ *
+ * 8 MB oznacza:
+ *
+ * 50 MB → około 7 requestów chunk
+ *
+ * zamiast np. 50 × 1 MB.
+ */
+const CHUNK =
+  8 * 1024 * 1024;
+
+
+/* ============================================================
+   ELEMENTY UI
+   ============================================================ */
+
+const filesEl =
+  document.querySelector("#files");
+
+const list =
+  document.querySelector("#list");
+
+const send =
+  document.querySelector("#send");
+
+const status =
+  document.querySelector("#status");
+
+const bar =
+  document.querySelector("#bar");
+
+const totalBar =
+  document.querySelector("#totalBar");
+
+const drop =
+  document.querySelector("#drop");
+
+const galleryEl =
+  document.querySelector("#gallery");
+
+const fileProgressLabel =
+  document.querySelector("#fileProgressLabel");
+
+const fileProgressPercent =
+  document.querySelector("#fileProgressPercent");
+
+const totalProgressLabel =
+  document.querySelector("#totalProgressLabel");
+
+const totalProgressPercent =
+  document.querySelector("#totalProgressPercent");
+
+const uploadedSize =
+  document.querySelector("#uploadedSize");
+
+const uploadSpeed =
+  document.querySelector("#uploadSpeed");
+
+const uploadEta =
+  document.querySelector("#uploadEta");
+
+
+/* ============================================================
+   POMOCNICZE
+   ============================================================ */
+
+function fmt(bytes) {
+
+  if (bytes < 1024) {
+    return bytes + " B";
   }
-  return true;
-}
 
-async function loadGallery(){
-  try{
-    const r = await fetch(`${ENDPOINT}?action=gallery`);
-    const data = await r.json();
-    if(!data.ok) throw new Error(data.error || "Błąd pobierania galerii.");
-    if(!data.items.length){ galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>'; return; }
-    galleryEl.innerHTML = data.items.map(f=>{
-      const thumb = `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`;
-      const full = `https://drive.google.com/file/d/${f.id}/view`;
-      return `<a href="${full}" target="_blank" rel="noopener"><img src="${thumb}" loading="lazy" alt=""></a>`;
-    }).join("");
-  }catch(e){
-    console.error(e);
-    galleryEl.innerHTML = '<div class="empty">Nie udało się załadować galerii.</div>';
+  if (bytes < 1024 * 1024) {
+    return (
+      (bytes / 1024).toFixed(0) +
+      " KB"
+    );
   }
+
+  if (bytes < 1024 * 1024 * 1024) {
+    return (
+      (bytes / 1024 / 1024).toFixed(1) +
+      " MB"
+    );
+  }
+
+  return (
+    (bytes / 1024 / 1024 / 1024).toFixed(2) +
+    " GB"
+  );
 }
 
-send.onclick=async()=>{
-  const files=[...filesEl.files];
-  if(!files.length){status.textContent="Wybierz przynajmniej jeden plik.";status.className="status err";return}
-  const bad=files.find(f=>f.size>MAX);
-  if(bad){status.textContent=`${bad.name} jest większy niż dozwolony limit.`;status.className="status err";return}
-  if(ENDPOINT.includes("TWOJ_DEPLOYMENT_ID")){status.textContent="Najpierw skonfiguruj adres Web App.";status.className="status err";return}
-  send.disabled=true;
-  try{
-    for(let i=0;i<files.length;i++){
-      status.textContent=`Wysyłanie ${i+1} z ${files.length}: ${files[i].name}`;
-      bar.style.width="0%";
-      await uploadFile(files[i]);
+
+function formatSpeed(bytesPerSecond) {
+
+  if (!bytesPerSecond || !isFinite(bytesPerSecond)) {
+    return "—";
+  }
+
+  return (
+    fmt(bytesPerSecond) +
+    "/s"
+  );
+}
+
+
+function formatEta(seconds) {
+
+  if (
+    !isFinite(seconds) ||
+    seconds < 0
+  ) {
+    return "—";
+  }
+
+  if (seconds < 60) {
+    return (
+      Math.ceil(seconds) +
+      " s"
+    );
+  }
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const secs =
+    Math.ceil(seconds % 60);
+
+  return (
+    minutes +
+    " min " +
+    secs +
+    " s"
+  );
+}
+
+
+/* ============================================================
+   RENDER LISTY PLIKÓW
+   ============================================================ */
+
+function render() {
+
+  list.innerHTML =
+    [...filesEl.files]
+      .map(function(file) {
+
+        return `
+          <div class="file">
+            <span>
+              ${escapeHtml(file.name)}
+            </span>
+
+            <span>
+              ${fmt(file.size)}
+            </span>
+          </div>
+        `;
+
+      })
+      .join("");
+}
+
+
+/*
+ * Proste zabezpieczenie przed wstawieniem
+ * nazwy pliku jako HTML.
+ */
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+filesEl.onchange =
+  render;
+
+
+/* ============================================================
+   DRAG & DROP
+   ============================================================ */
+
+[
+  "dragenter",
+  "dragover"
+].forEach(function(eventName) {
+
+  drop.addEventListener(
+    eventName,
+    function(event) {
+
+      event.preventDefault();
+
+      drop.classList.add("drag");
+
     }
-    bar.style.width="100%";
-    status.textContent="Gotowe! Dziękujemy za piękne wspomnienia ❤️";status.className="status ok";
-    filesEl.value="";list.innerHTML="";
-    loadGallery();
-  }catch(e){
-    console.error(e);
-    status.textContent = e.message || "Wystąpił błąd podczas wysyłania.";
-    status.className="status err";
-  }finally{
-    send.disabled=false;
+  );
+
+});
+
+
+[
+  "dragleave",
+  "drop"
+].forEach(function(eventName) {
+
+  drop.addEventListener(
+    eventName,
+    function(event) {
+
+      event.preventDefault();
+
+      drop.classList.remove("drag");
+
+    }
+  );
+
+});
+
+
+drop.addEventListener(
+  "drop",
+  function(event) {
+
+    filesEl.files =
+      event.dataTransfer.files;
+
+    render();
+
   }
-};
+);
+
+
+/* ============================================================
+   REQUEST DO APPS SCRIPT
+   ============================================================ */
+
+async function call(payload) {
+
+  const response =
+    await fetch(
+      ENDPOINT,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body:
+          JSON.stringify(payload)
+      }
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Błąd serwera HTTP " +
+      response.status
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+  return data;
+}
+
+
+/* ============================================================
+   BASE64
+   ============================================================ */
+
+function blobToBase64(blob) {
+
+  return new Promise(
+    function(resolve, reject) {
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        function() {
+
+          const result =
+            reader.result;
+
+          resolve(
+            result.split(",")[1]
+          );
+
+        };
+
+      reader.onerror =
+        reject;
+
+      reader.readAsDataURL(blob);
+
+    }
+  );
+}
+
+
+/* ============================================================
+   AKTUALIZACJA POSTĘPU
+   ============================================================ */
+
+function updateFileProgress(
+  uploaded,
+  total,
+  fileName
+) {
+
+  const percent =
+    total > 0
+      ? Math.round(
+          uploaded / total * 100
+        )
+      : 0;
+
+  bar.style.width =
+    percent + "%";
+
+  fileProgressPercent.textContent =
+    percent + "%";
+
+  fileProgressLabel.textContent =
+    fileName;
+}
+
+
+function updateTotalProgress(
+  uploaded,
+  total
+) {
+
+  const percent =
+    total > 0
+      ? Math.round(
+          uploaded / total * 100
+        )
+      : 0;
+
+  totalBar.style.width =
+    percent + "%";
+
+  totalProgressPercent.textContent =
+    percent + "%";
+
+  totalProgressLabel.textContent =
+    "Całość";
+}
+
+
+/* ============================================================
+   UPLOAD JEDNEGO PLIKU
+   ============================================================ */
+
+async function uploadFile(
+  file,
+  globalUploadedBefore,
+  globalTotal,
+  stats
+) {
+
+  if (file.size > MAX) {
+
+    throw new Error(
+      `${file.name} przekracza limit 50 MB.`
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * MAŁY PLIK
+   * ==========================================================
+   *
+   * Jeden request:
+   *
+   * smallUpload
+   *
+   * Bez:
+   *
+   * start
+   * session
+   * chunk
+   */
+
+  if (
+    file.size <=
+    SMALL_FILE_LIMIT
+  ) {
+
+    updateFileProgress(
+      0,
+      file.size,
+      file.name
+    );
+
+
+    const base64 =
+      await blobToBase64(file);
+
+
+    const result =
+      await call({
+        action:"smallUpload",
+
+        name:file.name,
+
+        mimeType:
+          file.type ||
+          "application/octet-stream",
+
+        data:base64
+      });
+
+
+    if (!result.ok) {
+
+      throw new Error(
+        result.error ||
+        "Nie udało się wysłać pliku."
+      );
+
+    }
+
+
+    /*
+     * Request się zakończył,
+     * więc dla małego pliku mamy 100%.
+     */
+
+    updateFileProgress(
+      file.size,
+      file.size,
+      file.name
+    );
+
+
+    stats.uploaded +=
+      file.size;
+
+    updateTotalProgress(
+      stats.uploaded,
+      globalTotal
+    );
+
+
+    updateStats(
+      stats,
+      globalTotal
+    );
+
+
+    return;
+  }
+
+
+  /*
+   * ==========================================================
+   * DUŻY PLIK
+   * ==========================================================
+   */
+
+  const init =
+    await call({
+      action:"start",
+
+      name:file.name,
+
+      mimeType:
+        file.type ||
+        "application/octet-stream",
+
+      size:file.size
+    });
+
+
+  if (
+    !init.ok ||
+    !init.uploadId
+  ) {
+
+    throw new Error(
+      init.error ||
+      "Nie udało się rozpocząć uploadu."
+    );
+
+  }
+
+
+  const uploadId =
+    init.uploadId;
+
+
+  let offset = 0;
+
+
+  while (
+    offset < file.size
+  ) {
+
+    const end =
+      Math.min(
+        offset + CHUNK,
+        file.size
+      );
+
+
+    const chunk =
+      file.slice(
+        offset,
+        end
+      );
+
+
+    /*
+     * Zamiana tylko aktualnego
+     * fragmentu na Base64.
+     */
+    const base64 =
+      await blobToBase64(chunk);
+
+
+    const result =
+      await call({
+
+        action:"chunk",
+
+        uploadId:
+
+          uploadId,
+
+        offset:
+
+          offset,
+
+        total:
+
+          file.size,
+
+        data:
+
+          base64
+
+      });
+
+
+    if (!result.ok) {
+
+      throw new Error(
+        result.error ||
+        "Błąd wysyłania fragmentu."
+      );
+
+    }
+
+
+    /*
+     * Drive potwierdził fragment.
+     */
+    offset +=
+      chunk.size;
+
+
+    /*
+     * Postęp aktualnego pliku.
+     */
+    updateFileProgress(
+      offset,
+      file.size,
+      file.name
+    );
+
+
+    /*
+     * Postęp całego uploadu.
+     */
+    stats.uploaded =
+      globalUploadedBefore +
+      offset;
+
+    updateTotalProgress(
+      stats.uploaded,
+      globalTotal
+    );
+
+
+    /*
+     * Statystyki prędkości.
+     */
+    updateStats(
+      stats,
+      globalTotal
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   STATYSTYKI
+   ============================================================ */
+
+function updateStats(
+  stats,
+  total
+) {
+
+  const elapsed =
+    (performance.now() -
+      stats.startTime) /
+    1000;
+
+
+  if (elapsed <= 0) {
+    return;
+  }
+
+
+  const speed =
+    stats.uploaded /
+    elapsed;
+
+
+  uploadSpeed.textContent =
+    formatSpeed(speed);
+
+
+  const remaining =
+    total -
+    stats.uploaded;
+
+
+  const eta =
+    speed > 0
+      ? remaining / speed
+      : Infinity;
+
+
+  uploadEta.textContent =
+    "pozostało " +
+    formatEta(eta);
+
+
+  uploadedSize.textContent =
+    fmt(stats.uploaded) +
+    " / " +
+    fmt(total);
+}
+
+
+/* ============================================================
+   GŁÓWNY UPLOAD
+   ============================================================ */
+
+send.onclick =
+  async function() {
+
+    const files =
+      [...filesEl.files];
+
+
+    /*
+     * Brak plików.
+     */
+
+    if (!files.length) {
+
+      status.textContent =
+        "Wybierz przynajmniej jeden plik.";
+
+      status.className =
+        "status err";
+
+      return;
+    }
+
+
+    /*
+     * Sprawdzenie limitów
+     * przed rozpoczęciem uploadu.
+     */
+
+    const bad =
+      files.find(
+        function(file) {
+          return file.size > MAX;
+        }
+      );
+
+
+    if (bad) {
+
+      status.textContent =
+        `${bad.name} jest większy niż dozwolony limit 50 MB.`;
+
+      status.className =
+        "status err";
+
+      return;
+    }
+
+
+    if (
+      ENDPOINT.includes(
+        "TWOJ_DEPLOYMENT_ID"
+      )
+    ) {
+
+      status.textContent =
+        "Najpierw skonfiguruj adres Web App.";
+
+      status.className =
+        "status err";
+
+      return;
+    }
+
+
+    /*
+     * Łączny rozmiar wszystkich plików.
+     */
+
+    const total =
+      files.reduce(
+        function(sum, file) {
+          return sum + file.size;
+        },
+        0
+      );
+
+
+    const stats = {
+
+      uploaded:0,
+
+      startTime:
+        performance.now()
+
+    };
+
+
+    send.disabled =
+      true;
+
+
+    /*
+     * Reset UI.
+     */
+
+    bar.style.width =
+      "0%";
+
+    totalBar.style.width =
+      "0%";
+
+    fileProgressPercent.textContent =
+      "0%";
+
+    totalProgressPercent.textContent =
+      "0%";
+
+    uploadedSize.textContent =
+      "0 B / " +
+      fmt(total);
+
+    uploadSpeed.textContent =
+      "—";
+
+    uploadEta.textContent =
+      "—";
+
+
+    try {
+
+      let uploadedBefore =
+        0;
+
+
+      /*
+       * Wysyłamy pliki kolejno.
+       *
+       * Dzięki temu nie generujemy
+       * wielu równoległych requestów
+       * do Apps Script.
+       */
+
+      for (
+        let i = 0;
+        i < files.length;
+        i++
+      ) {
+
+        const file =
+          files[i];
+
+
+        status.textContent =
+          `Wysyłanie ${i + 1} z ${files.length}: ${file.name}`;
+
+        status.className =
+          "status";
+
+
+        await uploadFile(
+          file,
+          uploadedBefore,
+          total,
+          stats
+        );
+
+
+        uploadedBefore +=
+          file.size;
+
+
+        /*
+         * Po zakończeniu pliku
+         * gwarantujemy 100%.
+         */
+
+        updateFileProgress(
+          file.size,
+          file.size,
+          file.name
+        );
+
+
+        updateTotalProgress(
+          stats.uploaded,
+          total
+        );
+
+      }
+
+
+      /*
+       * Wszystko zakończone.
+       */
+
+      stats.uploaded =
+        total;
+
+
+      updateTotalProgress(
+        total,
+        total
+      );
+
+
+      bar.style.width =
+        "100%";
+
+
+      totalBar.style.width =
+        "100%";
+
+
+      fileProgressPercent.textContent =
+        "100%";
+
+
+      totalProgressPercent.textContent =
+        "100%";
+
+
+      uploadEta.textContent =
+        "gotowe";
+
+
+      status.textContent =
+        "Gotowe! Dziękujemy za piękne wspomnienia ❤️";
+
+      status.className =
+        "status ok";
+
+
+      /*
+       * Czyścimy listę plików.
+       */
+
+      filesEl.value =
+        "";
+
+      list.innerHTML =
+        "";
+
+
+      /*
+       * Odświeżamy galerię.
+       */
+
+      loadGallery();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      status.textContent =
+        error.message ||
+        "Wystąpił błąd podczas wysyłania.";
+
+      status.className =
+        "status err";
+
+
+    } finally {
+
+      send.disabled =
+        false;
+
+    }
+
+  };
+
+
+/* ============================================================
+   GALERIA
+   ============================================================ */
+
+async function loadGallery() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${ENDPOINT}?action=gallery`
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.ok) {
+
+      throw new Error(
+        data.error ||
+        "Błąd pobierania galerii."
+      );
+
+    }
+
+
+    if (!data.items.length) {
+
+      galleryEl.innerHTML =
+        '<div class="empty">Jeszcze nie ma tu zdjęć.</div>';
+
+      return;
+    }
+
+
+    galleryEl.innerHTML =
+      data.items
+        .map(function(file) {
+
+          const thumb =
+            `https://drive.google.com/thumbnail?id=${encodeURIComponent(file.id)}&sz=w400`;
+
+          const full =
+            `https://drive.google.com/file/d/${encodeURIComponent(file.id)}/view`;
+
+
+          return `
+            <a
+              href="${full}"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="${thumb}"
+                loading="lazy"
+                alt=""
+              >
+            </a>
+          `;
+
+        })
+        .join("");
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    galleryEl.innerHTML =
+      '<div class="empty">Nie udało się załadować galerii.</div>';
+
+  }
+
+}
+
+
+/* ============================================================
+   START GALERII
+   ============================================================ */
 
 loadGallery();
+
 </script>
-</body></html>
+
+</body>
+</html>
