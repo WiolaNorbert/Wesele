@@ -41,7 +41,6 @@
 
 body {
   margin: 0;
-
   min-height: 100vh;
 
   font-family:
@@ -60,30 +59,25 @@ body {
 }
 
 .container {
-  width: min(900px, calc(100% - 32px));
+  width:
+    min(900px, calc(100% - 32px));
 
   margin: 0 auto;
 
   padding:
-    45px 0
-    60px;
+    45px 0 60px;
 }
 
 .hero {
   text-align: center;
-
   margin-bottom: 35px;
 }
 
 .small-title {
   font-size: 12px;
-
   letter-spacing: 4px;
-
   text-transform: uppercase;
-
   color: #8f7d73;
-
   margin-bottom: 12px;
 }
 
@@ -95,7 +89,7 @@ h1 {
   font-size:
     clamp(52px, 10vw, 90px);
 
-  line-height: 0.95;
+  line-height: .95;
 
   font-weight: 500;
 
@@ -117,11 +111,12 @@ h1 {
 }
 
 .card {
-  background: rgba(255,255,255,0.82);
+  background:
+    rgba(255,255,255,.82);
 
   border:
     1px solid
-    rgba(130,100,80,0.14);
+    rgba(130,100,80,.14);
 
   border-radius: 24px;
 
@@ -129,7 +124,7 @@ h1 {
 
   box-shadow:
     0 12px 40px
-    rgba(80,55,40,0.08);
+    rgba(80,55,40,.08);
 
   backdrop-filter: blur(8px);
 
@@ -148,19 +143,17 @@ h1 {
   padding: 35px 20px;
 
   transition:
-    background 0.2s,
-    border-color 0.2s;
+    background .2s,
+    border-color .2s;
 }
 
 .upload-area:hover {
   background: #fffaf7;
-
   border-color: #ad9588;
 }
 
 .upload-icon {
   font-size: 42px;
-
   margin-bottom: 12px;
 }
 
@@ -206,16 +199,15 @@ input[type="file"] {
 
   font-weight: 600;
 
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 
   transition:
-    transform 0.15s,
-    background 0.15s;
+    transform .15s,
+    background .15s;
 }
 
 .select-button:hover {
   background: #69574e;
-
   transform: translateY(-1px);
 }
 
@@ -224,12 +216,11 @@ input[type="file"] {
 }
 
 .file {
-  padding:
-    14px 0;
+  padding: 14px 0;
 
   border-bottom:
     1px solid
-    rgba(100,80,70,0.1);
+    rgba(100,80,70,.1);
 }
 
 .file:last-child {
@@ -239,7 +230,8 @@ input[type="file"] {
 .file-header {
   display: flex;
 
-  justify-content: space-between;
+  justify-content:
+    space-between;
 
   gap: 15px;
 
@@ -258,13 +250,11 @@ input[type="file"] {
 
 .file-status {
   white-space: nowrap;
-
   color: #8c7970;
 }
 
 .progress {
   width: 100%;
-
   height: 7px;
 
   background: #eee4de;
@@ -276,19 +266,19 @@ input[type="file"] {
 
 .progress-bar {
   width: 0%;
-
   height: 100%;
 
   background: #9d887c;
 
   transition:
-    width 0.15s linear;
+    width .15s linear;
 }
 
 .file-details {
   display: flex;
 
-  justify-content: space-between;
+  justify-content:
+    space-between;
 
   gap: 10px;
 
@@ -306,13 +296,14 @@ input[type="file"] {
 
   border-top:
     1px solid
-    rgba(100,80,70,0.1);
+    rgba(100,80,70,.1);
 }
 
 .total-title {
   display: flex;
 
-  justify-content: space-between;
+  justify-content:
+    space-between;
 
   font-size: 12px;
 
@@ -378,7 +369,6 @@ input[type="file"] {
 
 .gallery-item img {
   width: 100%;
-
   height: 100%;
 
   display: block;
@@ -421,13 +411,11 @@ input[type="file"] {
 
   .card {
     padding: 20px;
-
     border-radius: 18px;
   }
 
   .upload-area {
-    padding:
-      28px 15px;
+    padding: 28px 15px;
   }
 
   .file-header {
@@ -443,7 +431,6 @@ input[type="file"] {
 </style>
 
 </head>
-
 
 <body>
 
@@ -482,7 +469,9 @@ input[type="file"] {
 
         Dodaj swoje wspomnienia z naszego wesela.<br>
 
-        Zdjęcia i filmy do <strong>50 MB</strong> każdy.
+        Zdjęcia i filmy do
+        <strong>50 MB</strong>
+        każdy.
 
       </div>
 
@@ -557,9 +546,11 @@ input[type="file"] {
       id="gallery"
       class="gallery"
     >
+
       <div class="gallery-empty">
         Ładowanie zdjęć...
       </div>
+
     </div>
 
   </section>
@@ -588,42 +579,60 @@ const MAX_FILE_SIZE =
   50 * 1024 * 1024;
 
 
-/*
- * 8 MB.
- *
- * Google Drive resumable upload wymaga rozmiarów
- * będących wielokrotnością 256 KiB.
- */
+const SMALL_FILE_LIMIT =
+  5 * 1024 * 1024;
+
+
 const CHUNK_SIZE =
   8 * 1024 * 1024;
 
 
 /*
  * ============================================================
- * ELEMENTY UI
+ * ELEMENTY
  * ============================================================
  */
 
 const fileInput =
-  document.getElementById("fileInput");
+  document.getElementById(
+    "fileInput"
+  );
+
 
 const filesContainer =
-  document.getElementById("files");
+  document.getElementById(
+    "files"
+  );
+
 
 const message =
-  document.getElementById("message");
+  document.getElementById(
+    "message"
+  );
+
 
 const totalProgress =
-  document.getElementById("totalProgress");
+  document.getElementById(
+    "totalProgress"
+  );
+
 
 const totalBar =
-  document.getElementById("totalBar");
+  document.getElementById(
+    "totalBar"
+  );
+
 
 const totalPercent =
-  document.getElementById("totalPercent");
+  document.getElementById(
+    "totalPercent"
+  );
+
 
 const gallery =
-  document.getElementById("gallery");
+  document.getElementById(
+    "gallery"
+  );
 
 
 /*
@@ -638,16 +647,63 @@ function formatBytes(bytes) {
     return bytes + " B";
   }
 
-  if (bytes < 1024 * 1024) {
+
+  if (
+    bytes <
+    1024 * 1024
+  ) {
+
     return (
-      (bytes / 1024).toFixed(0)
-      + " KB"
+      (bytes / 1024)
+        .toFixed(0) +
+      " KB"
     );
   }
 
+
   return (
-    (bytes / 1024 / 1024).toFixed(1)
-    + " MB"
+    (bytes / 1024 / 1024)
+      .toFixed(1) +
+    " MB"
+  );
+}
+
+
+function formatTime(seconds) {
+
+  if (
+    !Number.isFinite(seconds) ||
+    seconds < 0
+  ) {
+    return "";
+  }
+
+
+  seconds =
+    Math.round(seconds);
+
+
+  if (seconds < 60) {
+    return seconds + " s";
+  }
+
+
+  const minutes =
+    Math.floor(
+      seconds / 60
+    );
+
+
+  const secs =
+    seconds % 60;
+
+
+  return (
+    minutes +
+    " min " +
+    String(secs)
+      .padStart(2, "0") +
+    " s"
   );
 }
 
@@ -655,53 +711,52 @@ function formatBytes(bytes) {
 function escapeHtml(value) {
 
   return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
 
+    .replace(
+      /&/g,
+      "&amp;"
+    )
 
-function formatTime(seconds) {
+    .replace(
+      /</g,
+      "&lt;"
+    )
 
-  if (!Number.isFinite(seconds) || seconds < 0) {
-    return "";
-  }
+    .replace(
+      />/g,
+      "&gt;"
+    )
 
-  seconds = Math.round(seconds);
+    .replace(
+      /"/g,
+      "&quot;"
+    )
 
-  if (seconds < 60) {
-    return seconds + " s";
-  }
-
-  const minutes =
-    Math.floor(seconds / 60);
-
-  const secs =
-    seconds % 60;
-
-  return (
-    minutes +
-    " min " +
-    String(secs).padStart(2, "0") +
-    " s"
-  );
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
 
 
 /*
- * POST do Apps Script.
+ * ============================================================
+ * APPS SCRIPT
+ * ============================================================
  *
- * Tutaj przesyłamy wyłącznie małe JSON-y z metadanymi.
- * Nigdy nie wysyłamy przez Apps Script zawartości pliku.
+ * Do Apps Script wysyłamy tylko JSON.
+ *
+ * Content-Type text/plain jest celowy:
+ * pozwala uniknąć dodatkowego CORS preflight.
  */
+
 async function callBackend(payload) {
 
   const response =
     await fetch(
       ENDPOINT,
       {
+
         method: "POST",
 
         headers: {
@@ -711,16 +766,22 @@ async function callBackend(payload) {
 
         body:
           JSON.stringify(payload)
+
       }
     );
+
 
   const text =
     await response.text();
 
+
   let data;
 
+
   try {
-    data = JSON.parse(text);
+
+    data =
+      JSON.parse(text);
 
   } catch (err) {
 
@@ -730,12 +791,15 @@ async function callBackend(payload) {
     );
   }
 
+
   if (!data.ok) {
+
     throw new Error(
       data.error ||
       "Nieznany błąd serwera."
     );
   }
+
 
   return data;
 }
@@ -743,38 +807,182 @@ async function callBackend(payload) {
 
 /*
  * ============================================================
- * UPLOAD BEZPOŚREDNIO DO GOOGLE DRIVE
+ * ARRAY BUFFER → BASE64
  * ============================================================
+ *
+ * Nie używamy:
+ *
+ *   btoa(String.fromCharCode(...bytes))
+ *
+ * dla całego chunka naraz, bo 8 MB mogłoby
+ * spowodować problemy ze stosem / argumentami funkcji.
  */
 
-async function uploadFile(file, ui) {
+function arrayBufferToBase64(buffer) {
 
-  if (file.size > MAX_FILE_SIZE) {
+  const bytes =
+    new Uint8Array(buffer);
 
-    throw new Error(
-      "Plik \"" +
-      file.name +
-      "\" jest za duży. Maksymalny rozmiar to 50 MB."
-    );
+
+  const chunk =
+    0x8000;
+
+
+  let binary = "";
+
+
+  for (
+    let i = 0;
+    i < bytes.length;
+    i += chunk
+  ) {
+
+    const part =
+      bytes.subarray(
+        i,
+        Math.min(
+          i + chunk,
+          bytes.length
+        )
+      );
+
+
+    binary +=
+      String.fromCharCode(
+        ...part
+      );
   }
 
 
+  return btoa(binary);
+}
+
+
+/*
+ * ============================================================
+ * MAŁY PLIK
+ * ============================================================
+ */
+
+async function uploadSmallFile(
+  file,
+  ui
+) {
+
+  ui.status.textContent =
+    "przygotowanie";
+
+
   /*
-   * 1. Prosisz Apps Script wyłącznie o utworzenie
-   *    resumable upload session.
+   * Czytamy plik jako ArrayBuffer.
    */
-  const sessionData =
+  const buffer =
+    await file.arrayBuffer();
+
+
+  /*
+   * Base64 tylko dla małego pliku.
+   */
+  const base64 =
+    arrayBufferToBase64(
+      buffer
+    );
+
+
+  ui.status.textContent =
+    "wysyłanie";
+
+
+  const startTime =
+    performance.now();
+
+
+  const result =
     await callBackend({
 
-      action: "start",
+      action:
+        "smallUpload",
 
-      name: file.name,
+      name:
+        file.name,
 
       mimeType:
         file.type ||
         "application/octet-stream",
 
-      size: file.size
+      data:
+        base64
+
+    });
+
+
+  const elapsed =
+    Math.max(
+      (performance.now() -
+        startTime) /
+      1000,
+      0.001
+    );
+
+
+  const speed =
+    file.size /
+    elapsed;
+
+
+  ui.bar.style.width =
+    "100%";
+
+
+  ui.status.textContent =
+    "gotowe";
+
+
+  ui.details.textContent =
+    formatBytes(file.size) +
+    " / " +
+    formatBytes(file.size) +
+    "    " +
+    formatBytes(speed) +
+    "/s";
+
+
+  return result;
+}
+
+
+/*
+ * ============================================================
+ * DUŻY PLIK
+ * ============================================================
+ */
+
+async function uploadLargeFile(
+  file,
+  ui,
+  totalState
+) {
+
+  /*
+   * 1. Tworzymy sesję.
+   *
+   * Do Apps Script wysyłamy tylko metadane.
+   */
+  const sessionData =
+    await callBackend({
+
+      action:
+        "start",
+
+      name:
+        file.name,
+
+      mimeType:
+        file.type ||
+        "application/octet-stream",
+
+      size:
+        file.size
 
     });
 
@@ -791,133 +999,141 @@ async function uploadFile(file, ui) {
   }
 
 
-  /*
-   * 2. Plik wysyłamy BEZPOŚREDNIO do Google Drive.
-   *
-   * Nie:
-   *
-   *   fetch(ENDPOINT)
-   *
-   * tylko:
-   *
-   *   fetch(session)
-   */
   let offset = 0;
+
 
   const startTime =
     performance.now();
 
 
-  while (offset < file.size) {
+  /*
+   * 2. Kolejne chunki.
+   */
+  while (
+    offset <
+    file.size
+  ) {
 
     const end =
       Math.min(
-        offset + CHUNK_SIZE,
+        offset +
+          CHUNK_SIZE,
         file.size
       );
 
-    const chunk =
+
+    /*
+     * Pobieramy tylko aktualny chunk.
+     */
+    const blob =
       file.slice(
         offset,
         end
       );
 
-    const chunkSize =
-      end - offset;
+
+    /*
+     * Blob → ArrayBuffer.
+     */
+    const buffer =
+      await blob.arrayBuffer();
 
 
-    const response =
-      await fetch(
-        session,
-        {
-          method: "PUT",
-
-          headers: {
-
-            "Content-Range":
-              "bytes " +
-              offset +
-              "-" +
-              (end - 1) +
-              "/" +
-              file.size,
-
-            "Content-Type":
-              file.type ||
-              "application/octet-stream"
-          },
-
-          body: chunk
-        }
+    /*
+     * ArrayBuffer → Base64.
+     */
+    const base64 =
+      arrayBufferToBase64(
+        buffer
       );
 
 
     /*
-     * Google Drive:
+     * 3. Chunk idzie do Apps Script.
      *
-     * 308 = chunk przyjęty, upload trwa
-     *
-     * 200/201 = cały plik zakończony
+     * Apps Script dekoduje go i przesyła
+     * binarnie do Google Drive.
      */
+    const result =
+      await callBackend({
+
+        action:
+          "chunk",
+
+        session:
+          session,
+
+        offset:
+          offset,
+
+        total:
+          file.size,
+
+        data:
+          base64
+
+      });
+
+
+    /*
+     * Serwer zwraca faktycznie przyjęty
+     * zakres bajtów.
+     */
+    offset =
+      Number(
+        result.uploaded
+      );
+
+
     if (
-      response.status !== 200 &&
-      response.status !== 201 &&
-      response.status !== 308
+      !Number.isFinite(offset)
     ) {
 
-      let errorText = "";
-
-      try {
-        errorText =
-          await response.text();
-
-      } catch (err) {
-        errorText = "";
-      }
-
       throw new Error(
-        "Google Drive upload error " +
-        response.status +
-        (
-          errorText
-            ? ": " + errorText
-            : ""
-        )
+        "Google Drive zwrócił nieprawidłowy postęp uploadu."
       );
     }
 
 
-    offset = end;
-
-
     /*
-     * Aktualizacja postępu.
+     * Postęp pliku.
      */
     const elapsed =
-      (performance.now() - startTime)
-      / 1000;
+      Math.max(
+        (performance.now() -
+          startTime) /
+        1000,
+        0.001
+      );
+
 
     const speed =
-      elapsed > 0
-        ? offset / elapsed
-        : 0;
+      offset /
+      elapsed;
+
 
     const remaining =
-      file.size - offset;
+      file.size -
+      offset;
+
 
     const eta =
       speed > 0
         ? remaining / speed
         : 0;
 
+
     const percent =
       file.size > 0
-        ? (offset / file.size) * 100
+        ? offset /
+          file.size *
+          100
         : 100;
 
 
     ui.bar.style.width =
-      percent.toFixed(1) + "%";
+      percent.toFixed(1) +
+      "%";
 
 
     ui.status.textContent =
@@ -942,27 +1158,113 @@ async function uploadFile(file, ui) {
 
 
     /*
-     * Aktualizujemy łączny postęp.
+     * Łączny postęp.
      */
-    updateTotalProgress();
+    totalState.uploaded =
+      totalState.baseUploaded +
+      offset;
+
+
+    updateTotalProgress(
+      totalState.allFiles,
+      totalState.totalSize
+    );
   }
 
 
   /*
-   * Gwarantujemy 100%.
+   * Koniec pliku.
    */
-  ui.bar.style.width = "100%";
+  ui.bar.style.width =
+    "100%";
 
   ui.status.textContent =
     "gotowe";
 
-  ui.details.textContent =
-    formatBytes(file.size) +
-    " / " +
-    formatBytes(file.size);
+
+  totalState.uploaded =
+    totalState.baseUploaded +
+    file.size;
 
 
-  updateTotalProgress();
+  updateTotalProgress(
+    totalState.allFiles,
+    totalState.totalSize
+  );
+}
+
+
+/*
+ * ============================================================
+ * UPLOAD PLIKU
+ * ============================================================
+ */
+
+async function uploadFile(
+  file,
+  ui,
+  totalState
+) {
+
+  if (
+    file.size >
+    MAX_FILE_SIZE
+  ) {
+
+    throw new Error(
+      "Plik \"" +
+      file.name +
+      "\" jest za duży. " +
+      "Maksymalny rozmiar to 50 MB."
+    );
+  }
+
+
+  /*
+   * Mały plik:
+   *
+   * 1 request.
+   */
+  if (
+    file.size <=
+    SMALL_FILE_LIMIT
+  ) {
+
+    const result =
+      await uploadSmallFile(
+        file,
+        ui
+      );
+
+
+    totalState.baseUploaded +=
+      file.size;
+
+
+    totalState.uploaded =
+      totalState.baseUploaded;
+
+
+    updateTotalProgress(
+      totalState.allFiles,
+      totalState.totalSize
+    );
+
+
+    return result;
+  }
+
+
+  /*
+   * Duży plik:
+   *
+   * resumable upload.
+   */
+  return uploadLargeFile(
+    file,
+    ui,
+    totalState
+  );
 }
 
 
@@ -975,7 +1277,10 @@ async function uploadFile(file, ui) {
 function createFileUI(file) {
 
   const wrapper =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   wrapper.className =
     "file";
@@ -1018,8 +1323,6 @@ function createFileUI(file) {
 
   return {
 
-    wrapper: wrapper,
-
     bar:
       wrapper.querySelector(
         ".progress-bar"
@@ -1034,6 +1337,7 @@ function createFileUI(file) {
       wrapper.querySelector(
         ".file-details"
       )
+
   };
 }
 
@@ -1044,43 +1348,40 @@ function createFileUI(file) {
  * ============================================================
  */
 
-let currentFiles = [];
-
-
-function updateTotalProgress() {
-
-  if (!currentFiles.length) {
-    return;
-  }
-
+function updateTotalProgress(
+  allFiles,
+  totalSize
+) {
 
   let uploaded = 0;
-
-  let total = 0;
 
 
   for (
     const item
-    of currentFiles
+    of allFiles
   ) {
 
-    total += item.file.size;
-
-    uploaded += item.uploaded || 0;
+    uploaded +=
+      item.uploaded || 0;
   }
 
 
   const percent =
-    total > 0
-      ? (uploaded / total) * 100
+    totalSize > 0
+      ? uploaded /
+        totalSize *
+        100
       : 0;
 
 
   totalBar.style.width =
-    percent.toFixed(1) + "%";
+    percent.toFixed(1) +
+    "%";
+
 
   totalPercent.textContent =
-    Math.round(percent) + "%";
+    Math.round(percent) +
+    "%";
 }
 
 
@@ -1105,56 +1406,114 @@ fileInput.addEventListener(
     }
 
 
-    filesContainer.innerHTML = "";
+    filesContainer.innerHTML =
+      "";
 
-    message.textContent = "";
+
+    message.textContent =
+      "";
+
 
     message.className =
       "message";
 
 
-    currentFiles =
-      selected.map(function(file) {
+    /*
+     * Sprawdzamy wszystkie pliki
+     * przed rozpoczęciem uploadu.
+     */
+    for (
+      const file
+      of selected
+    ) {
 
-        return {
-          file: file,
-          uploaded: 0,
-          ui: null
-        };
+      if (
+        file.size >
+        MAX_FILE_SIZE
+      ) {
 
-      });
+        message.textContent =
+          "Plik \"" +
+          file.name +
+          "\" jest za duży. " +
+          "Maksymalny rozmiar to 50 MB.";
+
+        message.className =
+          "message error";
+
+        return;
+      }
+    }
+
+
+    const allFiles =
+      selected.map(
+        function(file) {
+
+          return {
+            file:
+              file,
+
+            uploaded:
+              0,
+
+            ui:
+              createFileUI(file)
+
+          };
+        }
+      );
+
+
+    const totalSize =
+      selected.reduce(
+        function(sum, file) {
+          return sum +
+            file.size;
+        },
+        0
+      );
+
+
+    const totalState = {
+
+      allFiles:
+        allFiles,
+
+      totalSize:
+        totalSize,
+
+      baseUploaded:
+        0,
+
+      uploaded:
+        0
+
+    };
 
 
     totalProgress.style.display =
       "block";
 
 
-    for (
-      const item
-      of currentFiles
-    ) {
-
-      item.ui =
-        createFileUI(
-          item.file
-        );
-    }
+    updateTotalProgress(
+      allFiles,
+      totalSize
+    );
 
 
-    updateTotalProgress();
-
-
-    /*
-     * Wysyłamy sekwencyjnie.
-     *
-     * To ogranicza równoległe obciążenie
-     * przeglądarki i Google Drive.
-     */
     try {
 
+      /*
+       * Uploadujemy sekwencyjnie.
+       *
+       * Nie uruchamiamy np. 5 dużych filmów
+       * jednocześnie, bo zwiększyłoby to
+       * obciążenie Apps Script.
+       */
       for (
         const item
-        of currentFiles
+        of allFiles
       ) {
 
         item.ui.status.textContent =
@@ -1163,18 +1522,8 @@ fileInput.addEventListener(
 
         await uploadFile(
           item.file,
-          {
-
-            bar:
-              item.ui.bar,
-
-            status:
-              item.ui.status,
-
-            details:
-              item.ui.details
-
-          }
+          item.ui,
+          totalState
         );
 
 
@@ -1182,26 +1531,52 @@ fileInput.addEventListener(
           item.file.size;
 
 
-        updateTotalProgress();
+        totalState.baseUploaded =
+          allFiles
+            .slice(
+              0,
+              allFiles.indexOf(item) + 1
+            )
+            .reduce(
+              function(sum, x) {
+                return sum +
+                  x.file.size;
+              },
+              0
+            );
+
+
+        totalState.uploaded =
+          totalState.baseUploaded;
+
+
+        updateTotalProgress(
+          allFiles,
+          totalSize
+        );
       }
 
 
       message.textContent =
         "Wszystkie pliki zostały przesłane. Dziękujemy! ♡";
 
+
       message.className =
         "message success";
 
 
       /*
-       * Odświeżamy galerię po zakończeniu uploadu.
+       * Po zakończeniu uploadu odświeżamy galerię.
        */
       await loadGallery();
 
 
     } catch (err) {
 
-      console.error(err);
+      console.error(
+        "UPLOAD ERROR:",
+        err
+      );
 
 
       message.textContent =
@@ -1212,6 +1587,7 @@ fileInput.addEventListener(
             ? err.message
             : err
         );
+
 
       message.className =
         "message error";
@@ -1243,6 +1619,7 @@ async function loadGallery() {
 
 
     if (!data.ok) {
+
       throw new Error(
         data.error ||
         "Nie udało się pobrać galerii."
@@ -1257,9 +1634,11 @@ async function loadGallery() {
     if (!items.length) {
 
       gallery.innerHTML = `
+
         <div class="gallery-empty">
           Zdjęcia pojawią się tutaj po przesłaniu.
         </div>
+
       `;
 
       return;
@@ -1267,23 +1646,27 @@ async function loadGallery() {
 
 
     gallery.innerHTML =
-      items.map(function(item) {
+      items
+        .map(
+          function(item) {
 
-        return `
+            return `
 
-          <div class="gallery-item">
+              <div class="gallery-item">
 
-            <img
-              src="https://drive.google.com/thumbnail?id=${encodeURIComponent(item.id)}&sz=w1000"
-              alt="${escapeHtml(item.name)}"
-              loading="lazy"
-            >
+                <img
+                  src="https://drive.google.com/thumbnail?id=${encodeURIComponent(item.id)}&sz=w1000"
+                  alt="${escapeHtml(item.name)}"
+                  loading="lazy"
+                >
 
-          </div>
+              </div>
 
-        `;
+            `;
 
-      }).join("");
+          }
+        )
+        .join("");
 
 
   } catch (err) {
@@ -1295,9 +1678,11 @@ async function loadGallery() {
 
 
     gallery.innerHTML = `
+
       <div class="gallery-empty">
         Nie udało się załadować galerii.
       </div>
+
     `;
   }
 }
