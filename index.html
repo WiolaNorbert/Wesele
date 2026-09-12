@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="pl">
 
 <head>
@@ -18,7 +19,9 @@
   --ink:#3d3530;
   --muted:#8a7b70;
   --gold:#a88768;
-  --line:#e5d8cd
+  --line:#e5d8cd;
+  --success:#507052;
+  --error:#a24d4d;
 }
 
 *{
@@ -178,41 +181,81 @@ button{
   border-radius:999px;
   background:var(--gold);
   color:#fff;
-  cursor:pointer
+  cursor:pointer;
+  transition:.2s
+}
+
+.send:hover{
+  filter:brightness(.96)
 }
 
 .send:disabled{
-  opacity:.5
+  opacity:.5;
+  cursor:not-allowed
+}
+
+
+/* ============================================================
+   POSTĘP
+   ============================================================ */
+
+.progress-wrap{
+  margin-top:18px
+}
+
+.progress-info{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:7px;
+  min-height:18px
+}
+
+.progress-text{
+  font-size:11px;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.progress-percent{
+  font-size:11px;
+  font-weight:600;
+  color:var(--ink);
+  white-space:nowrap
 }
 
 .progress{
-  height:7px;
+  height:8px;
   background:#eee5de;
   border-radius:99px;
-  overflow:hidden;
-  margin-top:18px
+  overflow:hidden
 }
 
 .bar{
   height:100%;
-  width:0;
+  width:0%;
   background:var(--ink);
-  transition:width .2s
+  border-radius:99px;
+  transition:width .2s ease
 }
 
 .status{
   text-align:center;
   font-size:12px;
   margin-top:13px;
-  min-height:18px
+  min-height:18px;
+  line-height:1.5
 }
 
 .ok{
-  color:#507052
+  color:var(--success)
 }
 
 .err{
-  color:#a24d4d
+  color:var(--error)
 }
 
 .gallery{
@@ -266,8 +309,8 @@ button{
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
@@ -296,7 +339,6 @@ button{
 </div>
 
 </section>
-
 
 <section class="content">
 
@@ -329,27 +371,53 @@ button{
 
 </div>
 
-
 <button class="send" id="send">
   Wyślij wspomnienia
 </button>
 
+<!-- ============================================================
+     POSTĘP
+     ============================================================ -->
 
-<!-- JEDEN PASEK POSTĘPU -->
+<div class="progress-wrap">
 
-<div class="progress">
-  <div
-    class="bar"
-    id="bar"
-  ></div>
+  <div class="progress-info">
+
+```
+<div
+  class="progress-text"
+  id="progressText"
+>
+  Gotowe do wysłania
 </div>
 
+<div
+  class="progress-percent"
+  id="progressPercent"
+>
+  0%
+</div>
+```
+
+  </div>
+
+  <div class="progress">
+
+```
+<div
+  class="bar"
+  id="bar"
+></div>
+```
+
+  </div>
+
+</div>
 
 <div
   class="status"
   id="status"
 ></div>
-
 
 <div class="gallery">
 
@@ -368,18 +436,15 @@ button{
 
 </div>
 
-
 </section>
 
 </main>
-
 
 <div class="footer">
   Dziękujemy, że tworzysz z nami tę pamiątkę ♡
 </div>
 
 </div>
-
 
 <script>
 
@@ -402,6 +467,7 @@ const MAX =
  * Pliki > 5 MB:
  * upload resumable po fragmentach.
  */
+
 const SMALL_FILE_LIMIT =
   5 * 1024 * 1024;
 
@@ -410,6 +476,7 @@ const SMALL_FILE_LIMIT =
  * Musi odpowiadać CHUNK_SIZE
  * w Code.gs.
  */
+
 const CHUNK =
   8 * 1024 * 1024;
 
@@ -433,6 +500,12 @@ const status =
 const bar =
   document.querySelector("#bar");
 
+const progressText =
+  document.querySelector("#progressText");
+
+const progressPercent =
+  document.querySelector("#progressPercent");
+
 const drop =
   document.querySelector("#drop");
 
@@ -452,6 +525,10 @@ function fmt(n){
 
 }
 
+
+/*
+ * Zamiana Blob na Base64.
+ */
 
 function blobToBase64(blob){
 
@@ -478,17 +555,92 @@ function blobToBase64(blob){
 }
 
 
+/*
+ * Ustawienie paska postępu.
+ */
+
+function setProgress(percent){
+
+  percent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        percent
+      )
+    );
+
+
+  bar.style.width =
+    percent + "%";
+
+
+  progressPercent.textContent =
+    Math.round(percent) + "%";
+
+}
+
+
+/*
+ * Ustawienie komunikatu postępu.
+ */
+
+function setProgressMessage(message){
+
+  progressText.textContent =
+    message;
+
+}
+
+
+/*
+ * Reset paska.
+
+ * Używane przed rozpoczęciem wysyłania.
+ */
+
+function resetProgress(){
+
+  setProgress(0);
+
+  setProgressMessage(
+    "Przygotowanie do wysyłania…"
+  );
+
+}
+
+
+/*
+ * Renderowanie listy wybranych plików.
+ */
+
 function render(){
 
   list.innerHTML =
     [...filesEl.files]
       .map(f => `
         <div class="file">
-          <span>${f.name}</span>
+          <span>${escapeHtml(f.name)}</span>
           <span>${fmt(f.size)}</span>
         </div>
       `)
       .join("");
+
+}
+
+
+/*
+ * Bezpieczne wyświetlanie nazw plików.
+ */
+
+function escapeHtml(value){
+
+  return value
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
@@ -581,7 +733,11 @@ async function call(payload){
   }
 
 
-  return await r.json();
+  const result =
+    await r.json();
+
+
+  return result;
 
 }
 
@@ -590,15 +746,50 @@ async function call(payload){
    UPLOAD MAŁEGO PLIKU
    ============================================================ */
 
-async function uploadSmallFile(file){
+async function uploadSmallFile(
+  file,
+  fileIndex,
+  totalFiles,
+  completedBefore
+){
 
   /*
-   * Cały plik jest kodowany do Base64
-   * i wysyłany jednym requestem.
+   * Mały plik jest wysyłany jako jeden request.
+   *
+   * Nie możemy uzyskać rzeczywistego upload progress
+   * samego fetch(), ponieważ Fetch API nie udostępnia
+   * tutaj zdarzenia onprogress.
+   *
+   * Zamiast tego pokazujemy etapy:
+   *
+   * 0%  → przygotowanie
+   * 50% → Base64 gotowe
+   * 100% → serwer potwierdził upload
+   */
+
+
+  setProgressMessage(
+    `Wysyłanie ${fileIndex} z ${totalFiles}: ${file.name}`
+  );
+
+
+  setProgress(5);
+
+
+  /*
+   * Kodowanie pliku.
    */
 
   const base64 =
     await blobToBase64(file);
+
+
+  setProgress(50);
+
+
+  setProgressMessage(
+    `Wysyłanie ${fileIndex} z ${totalFiles}: ${file.name} — przesyłanie…`
+  );
 
 
   const result =
@@ -630,12 +821,12 @@ async function uploadSmallFile(file){
   }
 
 
-  /*
-   * Mały plik został wysłany.
-   */
+  setProgress(100);
 
-  bar.style.width =
-    "100%";
+
+  setProgressMessage(
+    `✓ Wysłano ${file.name}`
+  );
 
 
   return true;
@@ -647,12 +838,23 @@ async function uploadSmallFile(file){
    UPLOAD DUŻEGO PLIKU
    ============================================================ */
 
-async function uploadLargeFile(file){
+async function uploadLargeFile(
+  file,
+  fileIndex,
+  totalFiles
+){
 
   /*
-   * Najpierw tworzymy sesję uploadu
-   * po stronie Apps Script / Google Drive.
+   * Tworzymy sesję uploadu.
    */
+
+  setProgress(2);
+
+
+  setProgressMessage(
+    `Wysyłanie ${fileIndex} z ${totalFiles}: ${file.name} — rozpoczynanie…`
+  );
+
 
   const init =
     await call({
@@ -695,7 +897,7 @@ async function uploadLargeFile(file){
 
 
   /*
-   * Wysyłamy plik fragmentami.
+   * Wysyłamy kolejne fragmenty.
    */
 
   while(
@@ -717,12 +919,51 @@ async function uploadLargeFile(file){
 
 
     /*
+     * Informacja o aktualnym fragmencie.
+     */
+
+    const chunkNumber =
+      Math.floor(
+        offset / CHUNK
+      ) + 1;
+
+
+    const totalChunks =
+      Math.ceil(
+        file.size / CHUNK
+      );
+
+
+    setProgressMessage(
+      `Wysyłanie ${fileIndex} z ${totalFiles}: ${file.name} — fragment ${chunkNumber} z ${totalChunks}`
+    );
+
+
+    /*
      * Kodujemy tylko aktualny fragment.
      */
 
     const base64 =
       await blobToBase64(chunk);
 
+
+    /*
+     * Pokazujemy niewielki postęp również podczas
+     * przygotowywania fragmentu.
+     */
+
+    const encodingProgress =
+      offset / file.size * 100;
+
+
+    setProgress(
+      encodingProgress
+    );
+
+
+    /*
+     * Wysyłamy fragment.
+     */
 
     const result =
       await call({
@@ -755,26 +996,34 @@ async function uploadLargeFile(file){
     }
 
 
+    /*
+     * Dopiero po potwierdzeniu przez serwer
+     * uznajemy fragment za wysłany.
+     */
+
     offset =
       end;
 
 
-    /*
-     * AKTUALNY PASEK POSTĘPU
-     */
-
     const percent =
-      Math.round(
-        offset /
-        file.size *
-        100
-      );
+      offset /
+      file.size *
+      100;
 
 
-    bar.style.width =
-      percent + "%";
+    setProgress(
+      percent
+    );
 
   }
+
+
+  setProgress(100);
+
+
+  setProgressMessage(
+    `✓ Wysłano ${file.name}`
+  );
 
 
   return true;
@@ -786,7 +1035,11 @@ async function uploadLargeFile(file){
    UPLOAD PLIKU
    ============================================================ */
 
-async function uploadFile(file){
+async function uploadFile(
+  file,
+  fileIndex,
+  totalFiles
+){
 
   if(
     file.size > MAX
@@ -800,7 +1053,7 @@ async function uploadFile(file){
 
 
   /*
-   * Małe pliki wysyłamy jednym requestem.
+   * Mały plik.
    */
 
   if(
@@ -809,18 +1062,22 @@ async function uploadFile(file){
   ){
 
     return await uploadSmallFile(
-      file
+      file,
+      fileIndex,
+      totalFiles
     );
 
   }
 
 
   /*
-   * Duże pliki wysyłamy fragmentami.
+   * Duży plik.
    */
 
   return await uploadLargeFile(
-    file
+    file,
+    fileIndex,
+    totalFiles
   );
 
 }
@@ -865,13 +1122,6 @@ async function loadGallery(){
 
     }
 
-
-    /*
-     * Oryginalna galeria:
-     *
-     * miniatura → kliknięcie →
-     * Google Drive.
-     */
 
     galleryEl.innerHTML =
       data.items
@@ -952,7 +1202,7 @@ send.onclick =
     if(bad){
 
       status.textContent =
-        `${bad.name} jest większy niż dozwolony limit.`;
+        `${bad.name} jest większy niż dozwolony limit 50 MB.`;
 
       status.className =
         "status err";
@@ -983,15 +1233,30 @@ send.onclick =
       true;
 
 
+    status.className =
+      "status";
+
+
+    resetProgress();
+
+
     try{
 
       /*
-       * Pliki są wysyłane jeden po drugim.
+       * Liczba plików.
+       */
+
+      const totalFiles =
+        files.length;
+
+
+      /*
+       * Wysyłamy pliki jeden po drugim.
        */
 
       for(
         let i = 0;
-        i < files.length;
+        i < totalFiles;
         i++
       ){
 
@@ -999,30 +1264,65 @@ send.onclick =
           files[i];
 
 
+        const fileNumber =
+          i + 1;
+
+
         /*
-         * Informacja:
-         * np. "Wysyłanie 2 z 5: IMG_1234.jpg"
+         * Komunikat na początku pliku.
          */
 
         status.textContent =
-          `Wysyłanie ${i + 1} z ${files.length}: ${file.name}`;
+          `Przygotowywanie pliku ${fileNumber} z ${totalFiles}…`;
+
+
+        status.className =
+          "status";
 
 
         /*
-         * Pasek zaczyna od 0%
-         * dla każdego nowego pliku.
+         * Dla wielu plików pasek pokazuje postęp
+         * aktualnie wysyłanego pliku.
          */
 
-        bar.style.width =
-          "0%";
+        setProgress(
+          0
+        );
 
 
         /*
-         * Upload aktualnego pliku.
+         * Upload.
          */
 
         await uploadFile(
-          file
+          file,
+          fileNumber,
+          totalFiles
+        );
+
+
+        /*
+         * Plik został zakończony.
+         */
+
+        status.textContent =
+          `✓ Plik ${fileNumber} z ${totalFiles} został wysłany: ${file.name}`;
+
+
+        status.className =
+          "status ok";
+
+
+        /*
+         * Krótka chwila na pokazanie komunikatu.
+         */
+
+        await new Promise(
+          resolve =>
+            setTimeout(
+              resolve,
+              250
+            )
         );
 
       }
@@ -1032,12 +1332,17 @@ send.onclick =
        * Wszystkie pliki zakończone.
        */
 
-      bar.style.width =
-        "100%";
+      setProgress(100);
+
+
+      setProgressMessage(
+        "Wszystkie pliki zostały wysłane"
+      );
 
 
       status.textContent =
         "Gotowe! Dziękujemy za piękne wspomnienia ❤️";
+
 
       status.className =
         "status ok";
@@ -1058,12 +1363,13 @@ send.onclick =
        * Odświeżamy galerię.
        */
 
-      loadGallery();
+      await loadGallery();
 
 
     }catch(e){
 
       console.error(e);
+
 
       status.textContent =
         e.message ||
@@ -1071,6 +1377,11 @@ send.onclick =
 
       status.className =
         "status err";
+
+
+      setProgressMessage(
+        "Wysyłanie przerwane"
+      );
 
     }finally{
 
