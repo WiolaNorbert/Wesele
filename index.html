@@ -30,14 +30,14 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 <div class="wrap"><main class="card">
 <section class="hero">
 <div class="orn">❦ ❦ ❦</div><div class="eyebrow">nasze wspólne wspomnienia</div>
-<h1>Wiola & Norbert</h1>
+<h1>Podziel się chwilą</h1>
 <div class="subtitle">Dodaj swoje zdjęcia i filmy z tego wyjątkowego dnia</div>
 <div class="rule">♡</div>
 </section>
 <section class="content">
 <div class="drop" id="drop">
 <div class="icon">📷</div><strong>Wybierz zdjęcia lub filmy</strong>
-<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b id="maxLabel">50 MB</b>.</div>
+<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b>1 GB</b>.</div>
 <label class="choose">Wybierz pliki<input id="files" type="file" accept="image/*,video/*" multiple></label>
 <div class="list" id="list"></div>
 </div>
@@ -51,18 +51,12 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 
 </section></main>
 <div class="footer">Dziękujemy, że tworzysz z nami tę pamiątkę ♡</div></div>
-
-<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
 <script>
-/* ====== KONFIGURACJA — uzupełnij danymi ze swojego projektu Supabase ====== */
-const SUPABASE_URL = "https://ajeqltcaggbktzyljxgc.supabase.co"; // Project Settings -> API -> Project URL
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZXFsdGNhZ2dia3R6eWxqeGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDIxNDEsImV4cCI6MjEwNDc3ODE0MX0.8o7HGGoNFnuIiuhW2q9wNgCWf1HnEGSkt1syKqOTyLU";          // Project Settings -> API -> anon public key
-const BUCKET = "wesele";                                    // nazwa bucketu w Storage
-const FOLDER = "wn"; // wszystkie pliki lądują w tym "podfolderze" (w praktyce: prefiksie nazwy)
-const MAX = 50 * 1024 * 1024; // dopasuj do limitu pliku ustawionego w bucket settings
-/* =========================================================================== */
-
-document.querySelector("#maxLabel").textContent = (MAX/1048576).toFixed(0)+" MB";
+/* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
+const MAX = 50 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
+const CHUNK = 8 * 1024 * 1024;      // fragmenty po 8 MB
+/* ================================================================= */
 
 const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop"),galleryEl=document.querySelector("#gallery");
 
@@ -73,66 +67,41 @@ filesEl.onchange=render;
 ["dragleave","drop"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.remove("drag")}));
 drop.addEventListener("drop",e=>{filesEl.files=e.dataTransfer.files;render()});
 
-function safeName(name){
-  const dot=name.lastIndexOf(".");
-  const base=(dot>0?name.slice(0,dot):name).normalize("NFKD").replace(/[^\w\-]+/g,"_").slice(0,60);
-  const ext=dot>0?name.slice(dot):"";
-  const stamp=Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
-  return `${FOLDER}/${stamp}-${base}${ext}`;
+async function call(payload){
+  const r = await fetch(ENDPOINT, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(payload) });
+  if(!r.ok) throw new Error("Błąd serwera");
+  return await r.json();
 }
 
-function uploadFile(file){
-  return new Promise((resolve,reject)=>{
-    const objectName = safeName(file.name);
-    const upload = new tus.Upload(file,{
-      endpoint: `${SUPABASE_URL}/storage/v1/upload/resumable`,
-      retryDelays: [0,3000,5000,10000,20000],
-      headers:{
-        authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        apikey: SUPABASE_ANON_KEY,
-        "x-upsert": "false"
-      },
-      uploadDataDuringCreation: true,
-      removeFingerprintOnSuccess: true,
-      metadata:{
-        bucketName: BUCKET,
-        objectName: objectName,
-        contentType: file.type || "application/octet-stream",
-        cacheControl: "3600"
-      },
-      chunkSize: 6*1024*1024,
-      onError: (err)=>reject(err),
-      onProgress: (sent,total)=>{ bar.style.width = Math.round(sent/total*100)+"%" },
-      onSuccess: ()=>resolve()
+async function uploadFile(file){
+  if(file.size>MAX) throw new Error(`${file.name} przekracza limit rozmiaru.`);
+  const init = await call({ action:"start", name:file.name, mimeType:file.type||"application/octet-stream", size:file.size });
+  if(!init.ok || !init.session) throw new Error(init.error || "Nie udało się rozpocząć uploadu.");
+  let offset=0;
+  while(offset<file.size){
+    const chunk = file.slice(offset, Math.min(offset+CHUNK, file.size));
+    const r = await fetch(init.session, {
+      method:"PUT",
+      headers:{ "Content-Length":String(chunk.size), "Content-Range":`bytes ${offset}-${offset+chunk.size-1}/${file.size}` },
+      body: chunk
     });
-    upload.findPreviousUploads().then(prev=>{
-      if(prev.length) upload.resumeFromPreviousUpload(prev[0]);
-      upload.start();
-    });
-  });
+    if(!(r.ok || r.status===308)) throw new Error(`Błąd uploadu ${file.name} (${r.status})`);
+    offset += chunk.size;
+    bar.style.width = Math.round(offset/file.size*100)+"%";
+  }
+  return true;
 }
 
-// ---- Galeria: pobiera listę plików z Supabase Storage i pokazuje 10 ostatnich zdjęć ----
 async function loadGallery(){
   try{
-    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        apikey: SUPABASE_ANON_KEY,
-        authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify({ prefix:FOLDER, limit:100, offset:0, sortBy:{column:"created_at",order:"desc"} })
-    });
+    const r = await fetch(`${ENDPOINT}?action=gallery`);
     const data = await r.json();
-    if(!Array.isArray(data)) throw new Error(data.message||"Nie udało się pobrać galerii.");
-    const photos = data
-      .filter(f=>f.metadata && f.metadata.mimetype && f.metadata.mimetype.startsWith("image/"))
-      .slice(0,10);
-    if(!photos.length){ galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>'; return; }
-    galleryEl.innerHTML = photos.map(f=>{
-      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${FOLDER}/${encodeURIComponent(f.name)}`;
-      return `<a href="${url}" target="_blank" rel="noopener"><img src="${url}" loading="lazy" alt=""></a>`;
+    if(!data.ok) throw new Error(data.error || "Błąd pobierania galerii.");
+    if(!data.items.length){ galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>'; return; }
+    galleryEl.innerHTML = data.items.map(f=>{
+      const thumb = `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`;
+      const full = `https://drive.google.com/file/d/${f.id}/view`;
+      return `<a href="${full}" target="_blank" rel="noopener"><img src="${thumb}" loading="lazy" alt=""></a>`;
     }).join("");
   }catch(e){
     console.error(e);
@@ -145,9 +114,7 @@ send.onclick=async()=>{
   if(!files.length){status.textContent="Wybierz przynajmniej jeden plik.";status.className="status err";return}
   const bad=files.find(f=>f.size>MAX);
   if(bad){status.textContent=`${bad.name} jest większy niż dozwolony limit.`;status.className="status err";return}
-  if(SUPABASE_URL.includes("TWOJ-PROJEKT")||SUPABASE_ANON_KEY.includes("TWOJ_ANON")){
-    status.textContent="Najpierw uzupełnij dane Supabase w kodzie strony.";status.className="status err";return
-  }
+  if(ENDPOINT.includes("TWOJ_DEPLOYMENT_ID")){status.textContent="Najpierw skonfiguruj adres Web App.";status.className="status err";return}
   send.disabled=true;
   try{
     for(let i=0;i<files.length;i++){
@@ -158,10 +125,10 @@ send.onclick=async()=>{
     bar.style.width="100%";
     status.textContent="Gotowe! Dziękujemy za piękne wspomnienia ❤️";status.className="status ok";
     filesEl.value="";list.innerHTML="";
-    loadGallery(); // odśwież galerię o nowo wysłane zdjęcia
+    loadGallery();
   }catch(e){
     console.error(e);
-    status.textContent = (e && e.message) ? e.message : "Wystąpił błąd podczas wysyłania.";
+    status.textContent = e.message || "Wystąpił błąd podczas wysyłania.";
     status.className="status err";
   }finally{
     send.disabled=false;
