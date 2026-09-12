@@ -300,7 +300,6 @@ button{
 
 <section class="content">
 
-
 <div class="drop" id="drop">
 
 <div class="icon">
@@ -336,22 +335,12 @@ button{
 </button>
 
 
-<!-- POSTĘP AKTUALNEGO PLIKU -->
+<!-- JEDEN PASEK POSTĘPU -->
 
 <div class="progress">
   <div
     class="bar"
     id="bar"
-  ></div>
-</div>
-
-
-<!-- POSTĘP CAŁEGO UPLOADU -->
-
-<div class="progress">
-  <div
-    class="bar"
-    id="totalBar"
   ></div>
 </div>
 
@@ -407,9 +396,11 @@ const MAX =
 
 
 /*
- * Pliki <= 5 MB wysyłamy jednym requestem.
+ * Pliki <= 5 MB:
+ * jeden request do Apps Script.
  *
- * Większe pliki wysyłamy fragmentami.
+ * Pliki > 5 MB:
+ * upload resumable po fragmentach.
  */
 const SMALL_FILE_LIMIT =
   5 * 1024 * 1024;
@@ -417,7 +408,7 @@ const SMALL_FILE_LIMIT =
 
 /*
  * Musi odpowiadać CHUNK_SIZE
- * w obecnym Code.gs.
+ * w Code.gs.
  */
 const CHUNK =
   8 * 1024 * 1024;
@@ -441,9 +432,6 @@ const status =
 
 const bar =
   document.querySelector("#bar");
-
-const totalBar =
-  document.querySelector("#totalBar");
 
 const drop =
   document.querySelector("#drop");
@@ -605,8 +593,8 @@ async function call(payload){
 async function uploadSmallFile(file){
 
   /*
-   * Dla małego pliku przesyłamy całość
-   * w jednym request.
+   * Cały plik jest kodowany do Base64
+   * i wysyłany jednym requestem.
    */
 
   const base64 =
@@ -643,7 +631,7 @@ async function uploadSmallFile(file){
 
 
   /*
-   * Plik zakończony.
+   * Mały plik został wysłany.
    */
 
   bar.style.width =
@@ -662,7 +650,7 @@ async function uploadSmallFile(file){
 async function uploadLargeFile(file){
 
   /*
-   * Tworzymy sesję resumable
+   * Najpierw tworzymy sesję uploadu
    * po stronie Apps Script / Google Drive.
    */
 
@@ -706,6 +694,10 @@ async function uploadLargeFile(file){
     0;
 
 
+  /*
+   * Wysyłamy plik fragmentami.
+   */
+
   while(
     offset < file.size
   ){
@@ -725,8 +717,7 @@ async function uploadLargeFile(file){
 
 
     /*
-     * Kodujemy tylko aktualny
-     * fragment pliku.
+     * Kodujemy tylko aktualny fragment.
      */
 
     const base64 =
@@ -769,7 +760,7 @@ async function uploadLargeFile(file){
 
 
     /*
-     * POSTĘP AKTUALNEGO PLIKU
+     * AKTUALNY PASEK POSTĘPU
      */
 
     const percent =
@@ -792,7 +783,7 @@ async function uploadLargeFile(file){
 
 
 /* ============================================================
-   UPLOAD JEDNEGO PLIKU
+   UPLOAD PLIKU
    ============================================================ */
 
 async function uploadFile(file){
@@ -809,7 +800,7 @@ async function uploadFile(file){
 
 
   /*
-   * Mały plik.
+   * Małe pliki wysyłamy jednym requestem.
    */
 
   if(
@@ -825,7 +816,7 @@ async function uploadFile(file){
 
 
   /*
-   * Duży plik.
+   * Duże pliki wysyłamy fragmentami.
    */
 
   return await uploadLargeFile(
@@ -876,8 +867,10 @@ async function loadGallery(){
 
 
     /*
-     * Galeria pozostaje dokładnie
-     * w formie z Twojego HTML.
+     * Oryginalna galeria:
+     *
+     * miniatura → kliknięcie →
+     * Google Drive.
      */
 
     galleryEl.innerHTML =
@@ -947,7 +940,7 @@ send.onclick =
 
 
     /*
-     * Sprawdzenie limitu.
+     * Sprawdzenie limitu 50 MB.
      */
 
     const bad =
@@ -990,41 +983,10 @@ send.onclick =
       true;
 
 
-    /*
-     * Łączny rozmiar wszystkich plików.
-     *
-     * Dzięki temu drugi pasek pokazuje
-     * rzeczywisty procent całego uploadu,
-     * a nie tylko liczbę ukończonych plików.
-     */
-
-    const totalBytes =
-      files.reduce(
-        (sum,file) =>
-          sum + file.size,
-        0
-      );
-
-
-    let uploadedBytes =
-      0;
-
-
-    /*
-     * Zerujemy oba paski.
-     */
-
-    bar.style.width =
-      "0%";
-
-    totalBar.style.width =
-      "0%";
-
-
     try{
 
       /*
-       * Wysyłamy pliki jeden po drugim.
+       * Pliki są wysyłane jeden po drugim.
        */
 
       for(
@@ -1038,7 +1000,8 @@ send.onclick =
 
 
         /*
-         * Informacja o aktualnym pliku.
+         * Informacja:
+         * np. "Wysyłanie 2 z 5: IMG_1234.jpg"
          */
 
         status.textContent =
@@ -1046,8 +1009,8 @@ send.onclick =
 
 
         /*
-         * Pasek aktualnego pliku
-         * zaczyna od 0%.
+         * Pasek zaczyna od 0%
+         * dla każdego nowego pliku.
          */
 
         bar.style.width =
@@ -1055,215 +1018,12 @@ send.onclick =
 
 
         /*
-         * Dla dużych plików potrzebujemy
-         * aktualizować także pasek całkowity
-         * podczas każdego chunka.
-         *
-         * Zapamiętujemy stan przed rozpoczęciem.
+         * Upload aktualnego pliku.
          */
 
-        const fileStartBytes =
-          uploadedBytes;
-
-
-        /*
-         * Mały plik.
-         */
-
-        if(
-          file.size <=
-          SMALL_FILE_LIMIT
-        ){
-
-          await uploadSmallFile(
-            file
-          );
-
-
-          uploadedBytes +=
-            file.size;
-
-
-          bar.style.width =
-            "100%";
-
-
-          totalBar.style.width =
-            Math.round(
-              uploadedBytes /
-              totalBytes *
-              100
-            ) + "%";
-
-        }
-
-
-        /*
-         * Duży plik.
-         */
-
-        else{
-
-          const init =
-            await call({
-
-              action:
-                "start",
-
-              name:
-                file.name,
-
-              mimeType:
-                file.type ||
-                "application/octet-stream",
-
-              size:
-                file.size
-
-            });
-
-
-          if(
-            !init.ok ||
-            !init.session
-          ){
-
-            throw new Error(
-              init.error ||
-              "Nie udało się rozpocząć uploadu."
-            );
-
-          }
-
-
-          const session =
-            init.session;
-
-
-          let offset =
-            0;
-
-
-          while(
-            offset < file.size
-          ){
-
-            const end =
-              Math.min(
-                offset + CHUNK,
-                file.size
-              );
-
-
-            const chunk =
-              file.slice(
-                offset,
-                end
-              );
-
-
-            const base64 =
-              await blobToBase64(
-                chunk
-              );
-
-
-            const result =
-              await call({
-
-                action:
-                  "chunk",
-
-                session:
-                  session,
-
-                offset:
-                  offset,
-
-                total:
-                  file.size,
-
-                data:
-                  base64
-
-              });
-
-
-            if(!result.ok){
-
-              throw new Error(
-                result.error ||
-                `Błąd wysyłania fragmentu. Offset: ${offset}`
-              );
-
-            }
-
-
-            offset =
-              end;
-
-
-            /*
-             * POSTĘP AKTUALNEGO PLIKU
-             */
-
-            const filePercent =
-              Math.round(
-                offset /
-                file.size *
-                100
-              );
-
-
-            bar.style.width =
-              filePercent + "%";
-
-
-            /*
-             * POSTĘP CAŁOŚCI
-             *
-             * uploadedBytes zawiera
-             * już ukończone pliki,
-             * offset zawiera aktualny plik.
-             */
-
-            const overallPercent =
-              Math.round(
-                (
-                  fileStartBytes +
-                  offset
-                ) /
-                totalBytes *
-                100
-              );
-
-
-            totalBar.style.width =
-              overallPercent + "%";
-
-          }
-
-
-          /*
-           * Plik ukończony.
-           */
-
-          uploadedBytes +=
-            file.size;
-
-
-          bar.style.width =
-            "100%";
-
-
-          totalBar.style.width =
-            Math.round(
-              uploadedBytes /
-              totalBytes *
-              100
-            ) + "%";
-
-        }
+        await uploadFile(
+          file
+        );
 
       }
 
@@ -1275,9 +1035,6 @@ send.onclick =
       bar.style.width =
         "100%";
 
-      totalBar.style.width =
-        "100%";
-
 
       status.textContent =
         "Gotowe! Dziękujemy za piękne wspomnienia ❤️";
@@ -1287,7 +1044,7 @@ send.onclick =
 
 
       /*
-       * Czyścimy wybór plików.
+       * Czyścimy wybrane pliki.
        */
 
       filesEl.value =
