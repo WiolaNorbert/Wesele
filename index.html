@@ -53,8 +53,8 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 <div class="footer">Dziękujemy, że tworzysz z nami tę pamiątkę ♡</div></div>
 <script>
 /* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
-const MAX = 50 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
+const ENDPOINT = "https://script.google.com/macros/s/TWOJ_DEPLOYMENT_ID/exec";
+const MAX = 1 * 1024 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
 const CHUNK = 8 * 1024 * 1024;      // fragmenty po 8 MB
 /* ================================================================= */
 
@@ -76,16 +76,19 @@ async function call(payload){
 async function uploadFile(file){
   if(file.size>MAX) throw new Error(`${file.name} przekracza limit rozmiaru.`);
   const init = await call({ action:"start", name:file.name, mimeType:file.type||"application/octet-stream", size:file.size });
-  if(!init.ok || !init.session) throw new Error(init.error || "Nie udało się rozpocząć uploadu.");
+  if(!init.ok || !init.uploadId) throw new Error(init.error || "Nie udało się rozpocząć uploadu.");
+  const uploadId = init.uploadId;
   let offset=0;
   while(offset<file.size){
     const chunk = file.slice(offset, Math.min(offset+CHUNK, file.size));
-    const r = await fetch(init.session, {
-      method:"PUT",
-      headers:{ "Content-Length":String(chunk.size), "Content-Range":`bytes ${offset}-${offset+chunk.size-1}/${file.size}` },
+    const url = `${ENDPOINT}?action=chunk&uploadId=${uploadId}&offset=${offset}&total=${file.size}`;
+    const r = await fetch(url, {
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" }, // "text/plain" unika CORS preflight, mimo że treść jest binarna
       body: chunk
     });
-    if(!(r.ok || r.status===308)) throw new Error(`Błąd uploadu ${file.name} (${r.status})`);
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error || `Błąd wysyłania fragmentu (offset ${offset})`);
     offset += chunk.size;
     bar.style.width = Math.round(offset/file.size*100)+"%";
   }
