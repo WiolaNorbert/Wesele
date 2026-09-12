@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5eee8">
+<title>Nasze wspólne wspomnienia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap');
+:root{--bg:#f5eee8;--paper:#fffdfa;--ink:#3d3530;--muted:#8a7b70;--gold:#a88768;--line:#e5d8cd}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0,#fff 0,transparent 32%),radial-gradient(circle at 100% 100%,#e7dbd0 0,transparent 34%),var(--bg);color:var(--ink);font-family:Montserrat,system-ui,sans-serif}
+.wrap{max-width:720px;margin:auto;padding:24px 16px 40px}.card{background:rgba(255,253,250,.95);border:1px solid #a8876826;border-radius:30px;box-shadow:0 20px 70px #4d392611;overflow:hidden}
+.hero{text-align:center;padding:42px 24px 26px}.orn{font-size:25px;color:var(--gold);letter-spacing:9px}.eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:10px;color:var(--muted);margin-top:12px}
+h1{font:500 clamp(45px,12vw,72px)/.88 "Cormorant Garamond",Georgia,serif;margin:16px 0 12px}.subtitle{font:400 22px/1.2 "Cormorant Garamond",Georgia,serif;color:var(--muted)}.rule{display:flex;justify-content:center;align-items:center;gap:12px;color:var(--gold);margin:22px}.rule:before,.rule:after{content:"";width:62px;height:1px;background:var(--line)}
+.content{padding:0 25px 32px}.drop{border:1.5px dashed #cbb7a7;border-radius:22px;background:#fffaf5;padding:26px 18px;text-align:center;transition:.2s}.drop.drag{background:#f2e8df;border-color:var(--gold)}
+.icon{font-size:34px}.drop strong{display:block;margin:9px 0 5px}.small{font-size:11px;line-height:1.65;color:var(--muted)}
+input{display:none}.choose{display:inline-block;margin-top:15px;padding:12px 20px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.list{margin-top:15px;display:grid;gap:7px}.file{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;background:#f7f1ec;border-radius:10px;font-size:11px}.file span:last-child{color:var(--muted);white-space:nowrap}
+button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padding:15px;border:0;border-radius:999px;background:var(--gold);color:#fff;cursor:pointer}.send:disabled{opacity:.5}
+.progress{height:7px;background:#eee5de;border-radius:99px;overflow:hidden;margin-top:18px}.bar{height:100%;width:0;background:var(--ink);transition:width .2s}.status{text-align:center;font-size:12px;margin-top:13px;min-height:18px}.ok{color:#507052}.err{color:#a24d4d}
+.footer{text-align:center;color:var(--muted);font-size:10px;margin-top:18px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<section class="hero">
+<div class="orn">❦ ❦ ❦</div><div class="eyebrow">nasze wspólne wspomnienia</div>
+<h1>Podziel się chwilą</h1>
+<div class="subtitle">Dodaj swoje zdjęcia i filmy z tego wyjątkowego dnia</div>
+<div class="rule">♡</div>
+</section>
+<section class="content">
+<div class="drop" id="drop">
+<div class="icon">📷</div><strong>Wybierz zdjęcia lub filmy</strong>
+<div class="small">Możesz dodać wiele plików naraz.<br>Jeden plik może mieć maksymalnie <b id="maxLabel">50 MB</b>.</div>
+<label class="choose">Wybierz pliki<input id="files" type="file" accept="image/*,video/*" multiple></label>
+<div class="list" id="list"></div>
+</div>
+<button class="send" id="send">Wyślij wspomnienia</button>
+<div class="progress"><div class="bar" id="bar"></div></div><div class="status" id="status"></div>
+</section></main>
+<div class="footer">Dziękujemy, że tworzysz z nami tę pamiątkę ♡</div></div>
+
+<!-- Klient TUS do resumable uploadu (Supabase Storage używa protokołu TUS dla większych plików) -->
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
+<script>
+/* ====== KONFIGURACJA — uzupełnij danymi ze swojego projektu Supabase ====== */
+const SUPABASE_URL = "https://ajeqltcaggbktzyljxgc.supabase.co"; // Project Settings -> API -> Project URL
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZXFsdGNhZ2dia3R6eWxqeGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDIxNDEsImV4cCI6MjEwNDc3ODE0MX0.8o7HGGoNFnuIiuhW2q9wNgCWf1HnEGSkt1syKqOTyLU";          // Project Settings -> API -> anon public key
+const BUCKET = "wesele";                                    // nazwa bucketu w Storage
+const MAX = 50 * 1024 * 1024;                               // musi być <= limitowi ustawionemu w bucket settings
+/* =========================================================================== */
+
+document.querySelector("#maxLabel").textContent = (MAX/1048576).toFixed(0)+" MB";
+
+const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop");
+
+function fmt(n){return n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB"}
+function render(){list.innerHTML=[...filesEl.files].map(f=>`<div class="file"><span>${f.name}</span><span>${fmt(f.size)}</span></div>`).join("")}
+filesEl.onchange=render;
+["dragenter","dragover"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>{filesEl.files=e.dataTransfer.files;render()});
+
+function safeName(name){
+  const dot=name.lastIndexOf(".");
+  const base=(dot>0?name.slice(0,dot):name).normalize("NFKD").replace(/[^\w\-]+/g,"_").slice(0,60);
+  const ext=dot>0?name.slice(dot):"";
+  const stamp=Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+  return `${stamp}-${base}${ext}`;
+}
+
+function uploadFile(file){
+  return new Promise((resolve,reject)=>{
+    const objectName = safeName(file.name);
+    const upload = new tus.Upload(file,{
+      endpoint: `${SUPABASE_URL}/storage/v1/upload/resumable`,
+      retryDelays: [0,3000,5000,10000,20000],
+      headers:{
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
+        "x-upsert": "false"
+      },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata:{
+        bucketName: BUCKET,
+        objectName: objectName,
+        contentType: file.type || "application/octet-stream",
+        cacheControl: "3600"
+      },
+      chunkSize: 6*1024*1024, // Supabase wymaga dokładnie 6 MB na fragment
+      onError: (err)=>reject(err),
+      onProgress: (sent,total)=>{ bar.style.width = Math.round(sent/total*100)+"%" },
+      onSuccess: ()=>resolve()
+    });
+    upload.findPreviousUploads().then(prev=>{
+      if(prev.length) upload.resumeFromPreviousUpload(prev[0]);
+      upload.start();
+    });
+  });
+}
+
+send.onclick=async()=>{
+  const files=[...filesEl.files];
+  if(!files.length){status.textContent="Wybierz przynajmniej jeden plik.";status.className="status err";return}
+  const bad=files.find(f=>f.size>MAX);
+  if(bad){status.textContent=`${bad.name} jest większy niż dozwolony limit.`;status.className="status err";return}
+  if(SUPABASE_URL.includes("TWOJ-PROJEKT")||SUPABASE_ANON_KEY.includes("TWOJ_ANON")){
+    status.textContent="Najpierw uzupełnij dane Supabase w kodzie strony.";status.className="status err";return
+  }
+  send.disabled=true;
+  try{
+    for(let i=0;i<files.length;i++){
+      status.textContent=`Wysyłanie ${i+1} z ${files.length}: ${files[i].name}`;
+      bar.style.width="0%";
+      await uploadFile(files[i]);
+    }
+    bar.style.width="100%";
+    status.textContent="Gotowe! Dziękujemy za piękne wspomnienia ❤️";status.className="status ok";
+    filesEl.value="";list.innerHTML="";
+  }catch(e){
+    console.error(e);
+    status.textContent = (e && e.message) ? e.message : "Wystąpił błąd podczas wysyłania.";
+    status.className="status err";
+  }finally{
+    send.disabled=false;
+  }
+};
+</script>
+</body></html>
