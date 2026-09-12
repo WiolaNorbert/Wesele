@@ -55,8 +55,17 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 /* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
 const MAX = 1 * 1024 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
-const CHUNK = 8 * 1024 * 1024;      // fragmenty po 8 MB
+const CHUNK = 5 * 1024 * 1024;      // fragmenty po 5 MB (przed base64, więc "na drucie" ~6.7 MB)
 /* ================================================================= */
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(",")[1]); // odetnij prefiks "data:...;base64,"
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 
 const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop"),galleryEl=document.querySelector("#gallery");
 
@@ -81,13 +90,8 @@ async function uploadFile(file){
   let offset=0;
   while(offset<file.size){
     const chunk = file.slice(offset, Math.min(offset+CHUNK, file.size));
-    const url = `${ENDPOINT}?action=chunk&uploadId=${uploadId}&offset=${offset}&total=${file.size}`;
-    const r = await fetch(url, {
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" }, // "text/plain" unika CORS preflight, mimo że treść jest binarna
-      body: chunk
-    });
-    const data = await r.json();
+    const base64 = await blobToBase64(chunk);
+    const data = await call({ action:"chunk", uploadId, offset, total:file.size, data:base64 });
     if(!data.ok) throw new Error(data.error || `Błąd wysyłania fragmentu (offset ${offset})`);
     offset += chunk.size;
     bar.style.width = Math.round(offset/file.size*100)+"%";
