@@ -17,6 +17,12 @@ input{display:none}.choose{display:inline-block;margin-top:15px;padding:12px 20p
 .list{margin-top:15px;display:grid;gap:7px}.file{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;background:#f7f1ec;border-radius:10px;font-size:11px}.file span:last-child{color:var(--muted);white-space:nowrap}
 button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padding:15px;border:0;border-radius:999px;background:var(--gold);color:#fff;cursor:pointer}.send:disabled{opacity:.5}
 .progress{height:7px;background:#eee5de;border-radius:99px;overflow:hidden;margin-top:18px}.bar{height:100%;width:0;background:var(--ink);transition:width .2s}.status{text-align:center;font-size:12px;margin-top:13px;min-height:18px}.ok{color:#507052}.err{color:#a24d4d}
+.gallery{margin-top:34px;padding-top:28px;border-top:1px solid var(--line)}
+.gallery h2{font:500 26px "Cormorant Garamond",Georgia,serif;text-align:center;margin:0 0 16px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.grid a{display:block;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px #4d392622}
+.grid img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#eee5de}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:14px 0}
 .footer{text-align:center;color:var(--muted);font-size:10px;margin-top:18px;line-height:1.6}
 </style>
 </head>
@@ -37,22 +43,27 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 </div>
 <button class="send" id="send">Wyślij wspomnienia</button>
 <div class="progress"><div class="bar" id="bar"></div></div><div class="status" id="status"></div>
+
+<div class="gallery">
+<h2>Ostatnie zdjęcia</h2>
+<div class="grid" id="gallery"><div class="empty">Ładowanie…</div></div>
+</div>
+
 </section></main>
 <div class="footer">Dziękujemy, że tworzysz z nami tę pamiątkę ♡</div></div>
 
-<!-- Klient TUS do resumable uploadu (Supabase Storage używa protokołu TUS dla większych plików) -->
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
 <script>
 /* ====== KONFIGURACJA — uzupełnij danymi ze swojego projektu Supabase ====== */
 const SUPABASE_URL = "https://ajeqltcaggbktzyljxgc.supabase.co"; // Project Settings -> API -> Project URL
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZXFsdGNhZ2dia3R6eWxqeGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDIxNDEsImV4cCI6MjEwNDc3ODE0MX0.8o7HGGoNFnuIiuhW2q9wNgCWf1HnEGSkt1syKqOTyLU";          // Project Settings -> API -> anon public key
 const BUCKET = "wesele";                                    // nazwa bucketu w Storage
-const MAX = 50 * 1024 * 1024;                               // musi być <= limitowi ustawionemu w bucket settings
+const MAX = 50 * 1024 * 1024; // dopasuj do limitu pliku ustawionego w bucket settings
 /* =========================================================================== */
 
 document.querySelector("#maxLabel").textContent = (MAX/1048576).toFixed(0)+" MB";
 
-const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop");
+const filesEl=document.querySelector("#files"),list=document.querySelector("#list"),send=document.querySelector("#send"),status=document.querySelector("#status"),bar=document.querySelector("#bar"),drop=document.querySelector("#drop"),galleryEl=document.querySelector("#gallery");
 
 function fmt(n){return n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB"}
 function render(){list.innerHTML=[...filesEl.files].map(f=>`<div class="file"><span>${f.name}</span><span>${fmt(f.size)}</span></div>`).join("")}
@@ -88,7 +99,7 @@ function uploadFile(file){
         contentType: file.type || "application/octet-stream",
         cacheControl: "3600"
       },
-      chunkSize: 6*1024*1024, // Supabase wymaga dokładnie 6 MB na fragment
+      chunkSize: 6*1024*1024,
       onError: (err)=>reject(err),
       onProgress: (sent,total)=>{ bar.style.width = Math.round(sent/total*100)+"%" },
       onSuccess: ()=>resolve()
@@ -98,6 +109,34 @@ function uploadFile(file){
       upload.start();
     });
   });
+}
+
+// ---- Galeria: pobiera listę plików z Supabase Storage i pokazuje 10 ostatnich zdjęć ----
+async function loadGallery(){
+  try{
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        apikey: SUPABASE_ANON_KEY,
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ limit:100, offset:0, sortBy:{column:"created_at",order:"desc"} })
+    });
+    const data = await r.json();
+    if(!Array.isArray(data)) throw new Error(data.message||"Nie udało się pobrać galerii.");
+    const photos = data
+      .filter(f=>f.metadata && f.metadata.mimetype && f.metadata.mimetype.startsWith("image/"))
+      .slice(0,10);
+    if(!photos.length){ galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>'; return; }
+    galleryEl.innerHTML = photos.map(f=>{
+      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(f.name)}`;
+      return `<a href="${url}" target="_blank" rel="noopener"><img src="${url}" loading="lazy" alt=""></a>`;
+    }).join("");
+  }catch(e){
+    console.error(e);
+    galleryEl.innerHTML = '<div class="empty">Nie udało się załadować galerii.</div>';
+  }
 }
 
 send.onclick=async()=>{
@@ -118,6 +157,7 @@ send.onclick=async()=>{
     bar.style.width="100%";
     status.textContent="Gotowe! Dziękujemy za piękne wspomnienia ❤️";status.className="status ok";
     filesEl.value="";list.innerHTML="";
+    loadGallery(); // odśwież galerię o nowo wysłane zdjęcia
   }catch(e){
     console.error(e);
     status.textContent = (e && e.message) ? e.message : "Wystąpił błąd podczas wysyłania.";
@@ -126,5 +166,7 @@ send.onclick=async()=>{
     send.disabled=false;
   }
 };
+
+loadGallery();
 </script>
 </body></html>
