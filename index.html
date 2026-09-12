@@ -55,7 +55,7 @@ button{font:600 12px Montserrat,sans-serif}.send{width:100%;margin-top:17px;padd
 /* ====== KONFIGURACJA — uzupełnij adresem swojego Web App ====== */
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbwnwoJ95r2lJmI7PYf_2uJWPlgEOEjOl_UdJt-qnuI2YL5-k_l4t-n5kSFwITysDB_K/exec";
 const MAX = 1 * 1024 * 1024 * 1024; // 1 GB na plik — dopasuj wg potrzeb
-const CHUNK = 5 * 1024 * 1024;      // fragmenty po 5 MB (przed base64, więc "na drucie" ~6.7 MB)
+const CHUNK = 20 * 1024 * 1024;     // fragmenty po 20 MB (mniej requestów = mniej narzutu Apps Script)
 /* ================================================================= */
 
 function blobToBase64(blob){
