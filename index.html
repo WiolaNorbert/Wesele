@@ -1403,7 +1403,7 @@ send.onclick =
    ============================================================ */
 
 const SUPABASE_STORAGE_LIMIT = 1024 * 1024 * 1024; // 1 GB — darmowy limit Supabase
-const SUPABASE_SAFETY_MARGIN = 0.95; // chowamy link już przy 95% limitu, z zapasem
+const SUPABASE_SAFETY_MARGIN = 0.001; // chowamy link już przy 95% limitu, z zapasem
 
 async function checkSupabaseSpaceAndToggleLink(){
   const altLink = document.querySelector("#altlink");
