@@ -490,7 +490,16 @@ const SMALL_FILE_LIMIT =
 const CHUNK =
   8 * 1024 * 1024;
 
+/*
+ * Dane Supabase — potrzebne TYLKO do pokazania
+ * w jednej wspólnej galerii zdjęć z obu backendów.
+ * Upload nadal idzie przez Google Drive powyżej.
+ */
 
+const SUPABASE_URL = "https://ajeqltcaggbktzyljxgc.supabase.co"; // Project Settings -> API -> Project URL
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZXFsdGNhZ2dia3R6eWxqeGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDIxNDEsImV4cCI6MjEwNDc3ODE0MX0.8o7HGGoNFnuIiuhW2q9wNgCWf1HnEGSkt1syKqOTyLU";          // Project Settings -> API -> anon public key
+const SUPABASE_BUCKET = "wesele";
+  
 /* ============================================================
    ELEMENTY
    ============================================================ */
@@ -1094,84 +1103,70 @@ async function uploadFile(
 
 
 /* ============================================================
-   GALERIA
+   GALERIA (połączona: Google Drive + Supabase)
    ============================================================ */
 
-async function loadGallery(){
-
+async function fetchDriveImages(){
   try{
-
-    const r =
-      await fetch(
-        `${ENDPOINT}?action=gallery`
-      );
-
-
-    const data =
-      await r.json();
-
-
-    if(!data.ok){
-
-      throw new Error(
-        data.error ||
-        "Błąd pobierania galerii."
-      );
-
-    }
-
-
-    if(
-      !data.items.length
-    ){
-
-      galleryEl.innerHTML =
-        '<div class="empty">Jeszcze nie ma tu zdjęć.</div>';
-
-      return;
-
-    }
-
-
-    galleryEl.innerHTML =
-      data.items
-        .map(f => {
-
-          const thumb =
-            `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`;
-
-
-          const full =
-            `https://drive.google.com/file/d/${f.id}/view`;
-
-
-          return `
-            <a
-              href="${full}"
-              target="_blank"
-              rel="noopener"
-            >
-              <img
-                src="${thumb}"
-                loading="lazy"
-                alt=""
-              >
-            </a>
-          `;
-
-        })
-        .join("");
-
-
+    const r = await fetch(`${ENDPOINT}?action=gallery`);
+    const data = await r.json();
+    if(!data.ok) return [];
+    return data.items.map(f=>({
+      thumb: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
+      full: `https://drive.google.com/file/d/${f.id}/view`,
+      created: f.created
+    }));
   }catch(e){
+    console.error("Drive gallery error:", e);
+    return [];
+  }
+}
 
-    console.error(e);
+async function fetchSupabaseImages(){
+  try{
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${SUPABASE_BUCKET}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        apikey: SUPABASE_ANON_KEY,
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ prefix:"", limit:100, offset:0, sortBy:{column:"created_at",order:"desc"} })
+    });
+    const data = await r.json();
+    if(!Array.isArray(data)) return [];
+    return data
+      .filter(f=>f.metadata && f.metadata.mimetype && f.metadata.mimetype.startsWith("image/"))
+      .map(f=>{
+        const url = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${encodeURIComponent(f.name)}`;
+        return { thumb:url, full:url, created: new Date(f.created_at).getTime() };
+      });
+  }catch(e){
+    console.error("Supabase gallery error:", e);
+    return [];
+  }
+}
 
-    galleryEl.innerHTML =
-      '<div class="empty">Nie udało się załadować galerii.</div>';
+async function loadGallery(){
+  const [driveImages, supabaseImages] = await Promise.all([
+    fetchDriveImages(),
+    fetchSupabaseImages()
+  ]);
 
+  const merged = [...driveImages, ...supabaseImages]
+    .sort((a,b) => b.created - a.created)
+    .slice(0, 10);
+
+  if(!merged.length){
+    galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>';
+    return;
   }
 
+  galleryEl.innerHTML = merged.map(f => `
+    <a href="${f.full}" target="_blank" rel="noopener">
+      <img src="${f.thumb}" loading="lazy" alt="">
+    </a>
+  `).join("");
 }
 
 
