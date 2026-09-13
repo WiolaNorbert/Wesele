@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5eee8">
+
+<title>Nasze wspólne wspomnienia</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#f5eee8;
+  --paper:#fffdfa;
+  --ink:#3d3530;
+  --muted:#8a7b70;
+  --gold:#a88768;
+  --line:#e5d8cd;
+  --success:#507052;
+  --error:#a24d4d;
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 0,#fff 0,transparent 32%),
+    radial-gradient(circle at 100% 100%,#e7dbd0 0,transparent 34%),
+    var(--bg);
+  color:var(--ink);
+  font-family:Montserrat,system-ui,sans-serif
+}
+
+.wrap{
+  max-width:720px;
+  margin:auto;
+  padding:24px 16px 40px
+}
+
+.card{
+  background:rgba(255,253,250,.95);
+  border:1px solid #a8876826;
+  border-radius:30px;
+  box-shadow:0 20px 70px #4d392611;
+  overflow:hidden
+}
+
+.hero{
+  text-align:center;
+  padding:42px 24px 26px
+}
+
+.orn{
+  font-size:25px;
+  color:var(--gold);
+  letter-spacing:9px
+}
+
+.eyebrow{
+  text-transform:uppercase;
+  letter-spacing:3px;
+  font-size:10px;
+  color:var(--muted);
+  margin-top:12px
+}
+
+h1{
+  font:500 clamp(45px,12vw,72px)/.88 "Cormorant Garamond",Georgia,serif;
+  margin:16px 0 12px
+}
+
+.subtitle{
+  font:400 22px/1.2 "Cormorant Garamond",Georgia,serif;
+  color:var(--muted)
+}
+
+.rule{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  color:var(--gold);
+  margin:22px
+}
+
+.rule:before,
+.rule:after{
+  content:"";
+  width:62px;
+  height:1px;
+  background:var(--line)
+}
+
+.content{
+  padding:0 25px 32px
+}
+
+.drop{
+  border:1.5px dashed #cbb7a7;
+  border-radius:22px;
+  background:#fffaf5;
+  padding:26px 18px;
+  text-align:center;
+  transition:.2s
+}
+
+.drop.drag{
+  background:#f2e8df;
+  border-color:var(--gold)
+}
+
+.icon{
+  font-size:34px
+}
+
+.drop strong{
+  display:block;
+  margin:9px 0 5px
+}
+
+.small{
+  font-size:11px;
+  line-height:1.65;
+  color:var(--muted)
+}
+
+input{
+  display:none
+}
+
+.choose{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 20px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer
+}
+
+.list{
+  margin-top:15px;
+  display:grid;
+  gap:7px
+}
+
+.file{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 12px;
+  background:#f7f1ec;
+  border-radius:10px;
+  font-size:11px
+}
+
+.file span:last-child{
+  color:var(--muted);
+  white-space:nowrap
+}
+
+button{
+  font:600 12px Montserrat,sans-serif
+}
+
+.send{
+  width:100%;
+  margin-top:17px;
+  padding:15px;
+  border:0;
+  border-radius:999px;
+  background:var(--gold);
+  color:#fff;
+  cursor:pointer;
+  transition:.2s
+}
+
+.send:hover{
+  filter:brightness(.96)
+}
+
+.send:disabled{
+  opacity:.5;
+  cursor:not-allowed
+}
+
+.altlink{
+  display:block;
+  text-align:center;
+  margin-top:12px;
+  font-size:11px;
+  color:var(--muted);
+  text-decoration:underline;
+}
+
+.altlink:hover{
+  color:var(--ink)
+}
+
+
+/* ============================================================
+   POSTĘP
+   ============================================================ */
+
+.progress-wrap{
+  margin-top:18px
+}
+
+.progress-info{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:7px;
+  min-height:18px
+}
+
+.progress-text{
+  font-size:11px;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.progress-percent{
+  font-size:11px;
+  font-weight:600;
+  color:var(--ink);
+  white-space:nowrap
+}
+
+.progress{
+  height:8px;
+  background:#eee5de;
+  border-radius:99px;
+  overflow:hidden
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:var(--ink);
+  border-radius:99px;
+  transition:width .2s ease
+}
+
+.status{
+  text-align:center;
+  font-size:12px;
+  margin-top:13px;
+  min-height:18px;
+  line-height:1.5
+}
+
+.ok{
+  color:var(--success)
+}
+
+.err{
+  color:var(--error)
+}
+
+.gallery{
+  margin-top:34px;
+  padding-top:28px;
+  border-top:1px solid var(--line)
+}
+
+.gallery h2{
+  font:500 26px "Cormorant Garamond",Georgia,serif;
+  text-align:center;
+  margin:0 0 16px;
+  color:var(--ink)
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(92px,1fr));
+  gap:8px
+}
+
+.grid a{
+  display:block;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 4px 14px #4d392622
+}
+
+.grid img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+  background:#eee5de
+}
+
+.empty{
+  grid-column:1/-1;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  padding:14px 0
+}
+
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:18px;
+  line-height:1.6
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrap">
+
+<main class="card">
+
+<section class="hero">
+
+<div class="orn">❦ ❦ ❦</div>
+
+<div class="eyebrow">
+  nasze wspólne wspomnienia
+</div>
+
+<h1>
+  Wiola & Norbert
+</h1>
+
+<div class="subtitle">
+  Dodaj swoje zdjęcia i filmy z tego wyjątkowego dnia
+</div>
+
+<div class="rule">
+  ♡
+</div>
+
+</section>
+
+<section class="content">
+
+<div class="drop" id="drop">
+
+<div class="icon">
+  📷
+</div>
+
+<strong>
+  Wybierz zdjęcia lub filmy
+</strong>
+
+<div class="small">
+  Możesz dodać wiele plików naraz.<br>
+  Jeden plik może mieć maksymalnie <b id="maxLabel">50 MB</b>.
+</div>
+
+<label class="choose">
+  Wybierz pliki
+  <input
+    id="files"
+    type="file"
+    accept="image/*,video/*"
+    multiple
+  >
+</label>
+
+<div class="list" id="list"></div>
+
+</div>
+
+<button class="send" id="send">
+  Wyślij wspomnienia
+</button>
+
+<a href="index.html" class="altlink">Wróć do wersji Google Drive</a>
+
+<div class="progress-wrap">
+
+  <div class="progress-info">
+
+<div class="progress-text" id="progressText">
+  Gotowe do wysłania
+</div>
+
+<div class="progress-percent" id="progressPercent">
+  0%
+</div>
+
+  </div>
+
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="gallery">
+
+<h2>
+  Ostatnie zdjęcia
+</h2>
+
+<div class="grid" id="gallery">
+  <div class="empty">Ładowanie…</div>
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<div class="footer">
+  Dziękujemy, że tworzysz z nami tę pamiątkę ♡
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
+<script>
+
+/* ============================================================
+   KONFIGURACJA — uzupełnij danymi ze swojego projektu Supabase
+   ============================================================ */
+
+const SUPABASE_URL = "https://ajeqltcaggbktzyljxgc.supabase.co"; // Project Settings -> API -> Project URL
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZXFsdGNhZ2dia3R6eWxqeGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDIxNDEsImV4cCI6MjEwNDc3ODE0MX0.8o7HGGoNFnuIiuhW2q9wNgCWf1HnEGSkt1syKqOTyLU";          // Project Settings -> API -> anon public key
+const BUCKET = "wesele";
+const MAX = 50 * 1024 * 1024; // dopasuj do limitu pliku ustawionego w bucket settings
+
+/* ============================================================
+   ELEMENTY
+   ============================================================ */
+
+const filesEl = document.querySelector("#files");
+const list = document.querySelector("#list");
+const send = document.querySelector("#send");
+const status = document.querySelector("#status");
+const bar = document.querySelector("#bar");
+const progressText = document.querySelector("#progressText");
+const progressPercent = document.querySelector("#progressPercent");
+const drop = document.querySelector("#drop");
+const galleryEl = document.querySelector("#gallery");
+
+document.querySelector("#maxLabel").textContent = (MAX/1048576).toFixed(0)+" MB";
+
+/* ============================================================
+   POMOCNICZE
+   ============================================================ */
+
+function fmt(n){
+  return n < 1048576 ? (n/1024).toFixed(0)+" KB" : (n/1048576).toFixed(1)+" MB";
+}
+
+function escapeHtml(value){
+  return value
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function setProgress(percent){
+  percent = Math.max(0, Math.min(100, percent));
+  bar.style.width = percent+"%";
+  progressPercent.textContent = Math.round(percent)+"%";
+}
+
+function setProgressMessage(message){
+  progressText.textContent = message;
+}
+
+function resetProgress(){
+  setProgress(0);
+  setProgressMessage("Przygotowanie do wysyłania…");
+}
+
+function render(){
+  list.innerHTML = [...filesEl.files].map(f=>`
+    <div class="file"><span>${escapeHtml(f.name)}</span><span>${fmt(f.size)}</span></div>
+  `).join("");
+}
+filesEl.onchange = render;
+
+["dragenter","dragover"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>{filesEl.files=e.dataTransfer.files;render()});
+
+function safeName(name){
+  const dot=name.lastIndexOf(".");
+  const base=(dot>0?name.slice(0,dot):name).normalize("NFKD").replace(/[^\w\-]+/g,"_").slice(0,60);
+  const ext=dot>0?name.slice(dot):"";
+  const stamp=Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+  return `${stamp}-${base}${ext}`;
+}
+
+/* ============================================================
+   UPLOAD PLIKU (TUS — daje prawdziwy postęp co do bajta)
+   ============================================================ */
+
+function uploadFile(file, fileIndex, totalFiles){
+  return new Promise((resolve,reject)=>{
+    const objectName = safeName(file.name);
+    setProgressMessage(`Wysyłanie ${fileIndex} z ${totalFiles}: ${file.name}`);
+    setProgress(0);
+
+    const upload = new tus.Upload(file,{
+      endpoint: `${SUPABASE_URL}/storage/v1/upload/resumable`,
+      retryDelays: [0,3000,5000,10000,20000],
+      headers:{
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
+        "x-upsert": "false"
+      },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata:{
+        bucketName: BUCKET,
+        objectName: objectName,
+        contentType: file.type || "application/octet-stream",
+        cacheControl: "3600"
+      },
+      chunkSize: 6*1024*1024, // Supabase wymaga dokładnie 6 MB na fragment
+      onError: (err)=>reject(err),
+      onProgress: (sent,total)=>{
+        setProgress(sent/total*100);
+      },
+      onSuccess: ()=>{
+        setProgress(100);
+        setProgressMessage(`✓ Wysłano ${file.name}`);
+        resolve();
+      }
+    });
+    upload.findPreviousUploads().then(prev=>{
+      if(prev.length) upload.resumeFromPreviousUpload(prev[0]);
+      upload.start();
+    });
+  });
+}
+
+/* ============================================================
+   GALERIA
+   ============================================================ */
+
+async function loadGallery(){
+  try{
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        apikey: SUPABASE_ANON_KEY,
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ prefix:"", limit:100, offset:0, sortBy:{column:"created_at",order:"desc"} })
+    });
+    const data = await r.json();
+    if(!Array.isArray(data)) throw new Error(data.message||"Nie udało się pobrać galerii.");
+    const photos = data
+      .filter(f=>f.metadata && f.metadata.mimetype && f.metadata.mimetype.startsWith("image/"))
+      .slice(0,10);
+    if(!photos.length){ galleryEl.innerHTML = '<div class="empty">Jeszcze nie ma tu zdjęć.</div>'; return; }
+    galleryEl.innerHTML = photos.map(f=>{
+      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(f.name)}`;
+      return `<a href="${url}" target="_blank" rel="noopener"><img src="${url}" loading="lazy" alt=""></a>`;
+    }).join("");
+  }catch(e){
+    console.error(e);
+    galleryEl.innerHTML = '<div class="empty">Nie udało się załadować galerii.</div>';
+  }
+}
+
+/* ============================================================
+   WYŚLIJ WSPOMNIENIA
+   ============================================================ */
+
+send.onclick = async () => {
+  const files = [...filesEl.files];
+
+  if(!files.length){
+    status.textContent = "Wybierz przynajmniej jeden plik.";
+    status.className = "status err";
+    return;
+  }
+
+  const bad = files.find(f=>f.size>MAX);
+  if(bad){
+    status.textContent = `${bad.name} jest większy niż dozwolony limit.`;
+    status.className = "status err";
+    return;
+  }
+
+  if(SUPABASE_URL.includes("TWOJ-PROJEKT")||SUPABASE_ANON_KEY.includes("TWOJ_ANON")){
+    status.textContent = "Najpierw uzupełnij dane Supabase w kodzie strony.";
+    status.className = "status err";
+    return;
+  }
+
+  send.disabled = true;
+  status.className = "status";
+  resetProgress();
+
+  try{
+    const totalFiles = files.length;
+    for(let i=0;i<totalFiles;i++){
+      const file = files[i];
+      const fileNumber = i+1;
+      status.textContent = `Przygotowywanie pliku ${fileNumber} z ${totalFiles}…`;
+      status.className = "status";
+      await uploadFile(file, fileNumber, totalFiles);
+      status.textContent = `✓ Plik ${fileNumber} z ${totalFiles} został wysłany: ${file.name}`;
+      status.className = "status ok";
+      await new Promise(resolve=>setTimeout(resolve,250));
+    }
+
+    setProgress(100);
+    setProgressMessage("Wszystkie pliki zostały wysłane");
+    status.textContent = "Gotowe! Dziękujemy za piękne wspomnienia ❤️";
+    status.className = "status ok";
+
+    filesEl.value = "";
+    list.innerHTML = "";
+
+    await loadGallery();
+
+  }catch(e){
+    console.error(e);
+    status.textContent = (e && e.message) ? e.message : "Wystąpił błąd podczas wysyłania.";
+    status.className = "status err";
+    setProgressMessage("Wysyłanie przerwane");
+  }finally{
+    send.disabled = false;
+  }
+};
+
+/* ============================================================
+   START
+   ============================================================ */
+
+loadGallery();
+
+</script>
+
+</body>
+</html>
