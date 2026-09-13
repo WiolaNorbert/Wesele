@@ -387,7 +387,7 @@ button{
   Wyślij wspomnienia
 </button>
 
-<a href="supabase.html" class="altlink">Za wolno? Spróbuj tutaj!</a> 
+<a href="supabase.html" class="altlink" id="altlink">Za wolno? Spróbuj tutaj!</a>
 
 <!-- ============================================================
      POSTĘP
@@ -1399,10 +1399,48 @@ send.onclick =
 
 
 /* ============================================================
+   SPRAWDZENIE MIEJSCA W SUPABASE (chowa link "Za wolno?" gdy blisko limitu)
+   ============================================================ */
+
+const SUPABASE_STORAGE_LIMIT = 1024 * 1024 * 1024; // 1 GB — darmowy limit Supabase
+const SUPABASE_SAFETY_MARGIN = 0.95; // chowamy link już przy 95% limitu, z zapasem
+
+async function checkSupabaseSpaceAndToggleLink(){
+  const altLink = document.querySelector("#altlink");
+  if(!altLink) return;
+  try{
+    let total = 0;
+    let offset = 0;
+    const PAGE = 100;
+    while(true){
+      const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${SUPABASE_BUCKET}`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          apikey: SUPABASE_ANON_KEY,
+          authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({ prefix:"", limit:PAGE, offset, sortBy:{column:"name",order:"asc"} })
+      });
+      const data = await r.json();
+      if(!Array.isArray(data) || !data.length) break;
+      data.forEach(f=>{ if(f.metadata && f.metadata.size) total += f.metadata.size; });
+      offset += PAGE;
+      if(data.length < PAGE) break;
+    }
+    altLink.style.display = (total >= SUPABASE_STORAGE_LIMIT * SUPABASE_SAFETY_MARGIN) ? "none" : "";
+  }catch(e){
+    console.error("Nie udało się sprawdzić miejsca w Supabase:", e);
+    // w razie błędu zostawiamy link widoczny — lepiej pokazać go niepotrzebnie niż ukryć bez powodu
+  }
+}
+
+/* ============================================================
    START
    ============================================================ */
 
 loadGallery();
+checkSupabaseSpaceAndToggleLink();
 
 </script>
 
